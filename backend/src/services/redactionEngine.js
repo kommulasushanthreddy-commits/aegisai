@@ -1,11 +1,11 @@
 /**
  * AegisAI Prompt Redaction Security Engine (Foolproof Multi-Pass Scanner)
- * Guaranteed detection and masking of:
+ * Detects and masks:
  * - GITHUB_TOKEN (ghp_..., github_pat_..., gho_..., ghu_..., ghs_..., ghr_...)
  * - API_KEY (AIza..., AIzaSy..., sk-..., AKIA..., GEMINI_API_KEY=..., GOOGLE_API_KEY=...)
  * - AWS_SECRET_KEY (aws_secret_access_key=..., 40-char secret keys)
  * - CREDENTIAL_PASSWORD (DB_PASSWORD=..., JWT_SECRET=..., mongodb://user:pass@host)
- * - INTERNAL_ORG (http://internal.acme.corp, 10.x.x.x, CONFIDENTIAL NOTE)
+ * - INTERNAL_ORG (https://internal.company.local, http://internal.acme.corp, 10.x.x.x, CONFIDENTIAL NOTE)
  * - EMAIL & PHONE
  */
 
@@ -44,14 +44,14 @@ export function scanAndRedactPrompt(prompt) {
     // 6. Phone Numbers
     { type: 'PHONE', regex: /\b(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/g },
 
-    // 7. Database Passwords & JWT Secrets (DB_PASSWORD=..., JWT_SECRET=..., password=...)
+    // 7. Database Passwords & JWT Secrets
     { type: 'SSN_CREDENTIAL', regex: /(?:DB_PASSWORD|POSTGRES_PASSWORD|MYSQL_PASSWORD|REDIS_PASSWORD|PASSWORD|PASS|PWD|JWT_SECRET|SECRET_KEY|CLIENT_SECRET|PRIVATE_KEY)\s*[:=]\s*['"]?([^\s'"\n;,]{3,})['"]?/gi },
 
     // 8. DB Connection String Credentials
     { type: 'SSN_CREDENTIAL', regex: /\b(?:mongodb(?:\+srv)?|postgres(?:ql)?|mysql|redis|mssql):\/\/[A-Za-z0-9_%-]+:([^\s@]+)@[A-Za-z0-9._%-]+(?::\d+)?\/[A-Za-z0-9._%-]*/gi },
 
-    // 9. Internal URLs & Server Hostnames
-    { type: 'INTERNAL_ORG', regex: /\bhttps?:\/\/(?:localhost|127\.0\.0\.1|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|[A-Za-z0-9_-]+\.internal|[A-Za-z0-9_-]+\.local|[A-Za-z0-9_-]+\.acme\.corp)(?::\d+)?(?:\/[^\s]*)?\b/gi },
+    // 9. Internal URLs & Infrastructure Hostnames (e.g., https://internal.company.local, http://internal.acme.corp)
+    { type: 'INTERNAL_ORG', regex: /\bhttps?:\/\/[A-Za-z0-9_.-]*(?:internal|private|local|corp|lan|intranet|acme|company|localhost|127\.0\.0\.1|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3})[A-Za-z0-9_.-]*(?::\d+)?(?:\/[^\s,;'"<>]*)?/gi },
 
     // 10. Internal IPs
     { type: 'INTERNAL_ORG', regex: /\b(?:10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3})\b/g },

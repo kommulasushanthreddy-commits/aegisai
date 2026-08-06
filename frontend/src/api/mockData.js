@@ -62,6 +62,7 @@ export function processMockRedaction(prompt) {
 
     // 4. AWS Secret Access Keys (aws_secret_access_key=... or 40-char string)
     { type: 'API_KEY', regex: /(?:aws_secret_access_key|aws_secret_key|aws_secret|secret_access_key)\s*[:=]\s*['"]?([A-Za-z0-9/+=]{30,})['"]?/gi },
+    { type: 'API_KEY', regex: /\b[A-Za-z0-9/+=]{40}\b/g },
 
     // 5. Emails
     { type: 'EMAIL', regex: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g },
@@ -75,8 +76,8 @@ export function processMockRedaction(prompt) {
     // 8. DB Connection String Credentials
     { type: 'SSN_CREDENTIAL', regex: /\b(?:mongodb(?:\+srv)?|postgres(?:ql)?|mysql|redis|mssql):\/\/[A-Za-z0-9_%-]+:([^\s@]+)@[A-Za-z0-9._%-]+(?::\d+)?\/[A-Za-z0-9._%-]*/gi },
 
-    // 9. Internal URLs & Server Hostnames
-    { type: 'INTERNAL_ORG', regex: /\bhttps?:\/\/(?:localhost|127\.0\.0\.1|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|[A-Za-z0-9_-]+\.internal|[A-Za-z0-9_-]+\.local|[A-Za-z0-9_-]+\.acme\.corp)(?::\d+)?(?:\/[^\s]*)?\b/gi },
+    // 9. Internal URLs & Infrastructure Hostnames (e.g., https://internal.company.local)
+    { type: 'INTERNAL_ORG', regex: /\bhttps?:\/\/[A-Za-z0-9_.-]*(?:internal|private|local|corp|lan|intranet|acme|company|localhost|127\.0\.0\.1|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3})[A-Za-z0-9_.-]*(?::\d+)?(?:\/[^\s,;'"<>]*)?/gi },
 
     // 10. Internal IPs
     { type: 'INTERNAL_ORG', regex: /\b(?:10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3})\b/g },

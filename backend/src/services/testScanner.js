@@ -13,8 +13,9 @@ Here is our setup script:
 9. Standalone Gemini Key: AIzaSyA1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6
 10. Database Password: DB_PASSWORD=SuperSecure@123
 11. JWT Secret: JWT_SECRET=aegis_ai_hackathon_super_secret_jwt_key_2026
-12. Internal URL: http://internal.acme.corp/api/v1
-13. Confidential Note: CONFIDENTIAL NOTE: Do not share with third parties.
+12. Internal URL 1: http://internal.acme.corp/api/v1
+13. Internal URL 2: https://internal.company.local
+14. Confidential Note: CONFIDENTIAL NOTE: Do not share with third parties.
 `;
 
 console.log("--- TESTING SCANNER ---");
