@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { validateBody } from '../middleware/validate.js';
 import { authenticateToken } from '../middleware/auth.js';
-import { scanAndRedactPrompt } from '../services/redactionEngine.js';
+import { scanAndRedactPrompt, callLiveAiModel } from '../services/redactionEngine.js';
 import { addAuditBlock } from '../services/auditChainService.js';
 
 const router = Router();
@@ -20,7 +20,6 @@ router.post('/scan', authenticateToken, validateBody(scanSchema), (req, res) => 
   const { prompt } = req.body;
   const result = scanAndRedactPrompt(prompt);
 
-  // Record event to hash-chained audit log
   const actor = req.user?.email || 'anonymous@acme-corp.com';
   const entityCount = result.entities.length;
   addAuditBlock({
@@ -39,7 +38,7 @@ router.post('/scan', authenticateToken, validateBody(scanSchema), (req, res) => 
 });
 
 // POST /api/redaction/forward
-router.post('/forward', authenticateToken, validateBody(forwardSchema), (req, res) => {
+router.post('/forward', authenticateToken, validateBody(forwardSchema), async (req, res) => {
   const { maskedPrompt } = req.body;
 
   const actor = req.user?.email || 'anonymous@acme-corp.com';
@@ -49,8 +48,11 @@ router.post('/forward', authenticateToken, validateBody(forwardSchema), (req, re
     detail: 'Forwarded safe masked prompt to AI Model Gateway'
   });
 
+  const aiResult = await callLiveAiModel(maskedPrompt);
+
   res.json({
-    aiResponseMasked: `Processed query for [REDACTED_INTERNAL_ORG]. Access credentials such as [REDACTED_API_KEY] should be rotated immediately. Contact [REDACTED_PERSON] ([REDACTED_EMAIL]) for official authorization.`,
+    aiResponseMasked: aiResult.aiResponseMasked,
+    aiResponseUnmasked: aiResult.aiResponseUnmasked,
     receivedAt: new Date().toISOString()
   });
 });
