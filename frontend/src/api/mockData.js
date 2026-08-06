@@ -48,11 +48,11 @@ export function processMockRedaction(prompt) {
   const rawEntities = [];
 
   const patterns = [
-    // 1. GitHub Tokens (ghp_..., github_pat_..., gho_..., ghu_..., ghs_..., ghr_...)
+    // 1. GitHub Tokens
     { type: 'GITHUB_TOKEN', regex: /(?:ghp_|github_pat_|gho_|ghu_|ghs_|ghr_)[A-Za-z0-9_-]{8,}/gi },
     { type: 'GITHUB_TOKEN', regex: /(?:github_token|gh_token|github_pat|ghp)\s*[:=]\s*['"]?([A-Za-z0-9_]{8,})['"]?/gi },
 
-    // 2. Google AI Studio & Gemini API Keys (AIzaSy..., AIza...)
+    // 2. Google AI Studio & Gemini API Keys
     { type: 'API_KEY', regex: /AIza[0-9A-Za-z_-]{20,}/g },
     { type: 'API_KEY', regex: /(?:GEMINI_API_KEY|GOOGLE_API_KEY|GEMINI_KEY|GOOGLE_KEY)\s*[:=]\s*['"]?([A-Za-z0-9_\-]{16,})['"]?/gi },
 
@@ -60,7 +60,7 @@ export function processMockRedaction(prompt) {
     { type: 'API_KEY', regex: /(?:sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16})/g },
     { type: 'API_KEY', regex: /(?:OPENAI_API_KEY|ANTHROPIC_API_KEY|AWS_ACCESS_KEY_ID|AWS_KEY|API_KEY|APIKEY)\s*[:=]\s*['"]?([A-Za-z0-9_\-]{16,})['"]?/gi },
 
-    // 4. AWS Secret Access Keys (aws_secret_access_key=... or 40-char string)
+    // 4. AWS Secret Access Keys
     { type: 'API_KEY', regex: /(?:aws_secret_access_key|aws_secret_key|aws_secret|secret_access_key)\s*[:=]\s*['"]?([A-Za-z0-9/+=]{30,})['"]?/gi },
     { type: 'API_KEY', regex: /\b[A-Za-z0-9/+=]{40}\b/g },
 
@@ -76,7 +76,7 @@ export function processMockRedaction(prompt) {
     // 8. DB Connection String Credentials
     { type: 'SSN_CREDENTIAL', regex: /\b(?:mongodb(?:\+srv)?|postgres(?:ql)?|mysql|redis|mssql):\/\/[A-Za-z0-9_%-]+:([^\s@]+)@[A-Za-z0-9._%-]+(?::\d+)?\/[A-Za-z0-9._%-]*/gi },
 
-    // 9. Internal URLs & Infrastructure Hostnames (e.g., https://internal.company.local)
+    // 9. Internal URLs & Infrastructure Hostnames
     { type: 'INTERNAL_ORG', regex: /\bhttps?:\/\/[A-Za-z0-9_.-]*(?:internal|private|local|corp|lan|intranet|acme|company|localhost|127\.0\.0\.1|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3})[A-Za-z0-9_.-]*(?::\d+)?(?:\/[^\s,;'"<>]*)?/gi },
 
     // 10. Internal IPs
@@ -150,40 +150,68 @@ export function processMockRedaction(prompt) {
   };
 }
 
-export function processMockPhishing(message, sender = '', subject = '') {
-  const text = `${subject} ${sender} ${message}`.toLowerCase();
+// Multi-Vector Phishing Analyzer
+export function processMockPhishing(message = '', sender = '', subject = '') {
+  const fullText = `${subject} ${sender} ${message}`.toLowerCase();
+  const senderLower = sender.toLowerCase();
   const flags = [];
-  let score = 15;
+  let score = 10;
 
-  if (/verify your account|account suspended|immediate action|within 24 hours|urgent/i.test(text)) {
-    score += 35;
-    flags.push({
-      label: 'Urgency & Coercion Language',
-      explanation: 'Uses pressure tactics ("within 24 hours", "immediate action required") commonly seen in credential harvesting.'
-    });
-  }
-
-  if (/login|signin|update-password|auth-check|security-update/i.test(text) && /http|link|click here|bit\.ly/i.test(text)) {
+  if (/urgent|action required|immediate action|within \d+ (minutes|mins|hours|hrs)|asap|emergency|critical alert|deadline|time-sensitive|act now/i.test(fullText)) {
     score += 30;
     flags.push({
-      label: 'Suspicious Authentication Link',
-      explanation: 'Prompting user to click an external link to perform authentication or password reset.'
+      label: 'Urgent & Coercive Pressure Language',
+      explanation: 'Employs artificial time pressure ("URGENT", "within 30 minutes", "Action Required") to force impulsive compliance.'
     });
   }
 
-  if (/@(gmail|yahoo|hotmail|outlook)\.com/i.test(sender) && /bank|paypal|it support|hr department|ceo|security team/i.test(text)) {
+  if (/password reset|reset your password|update credentials|verify credentials|confirm password|re-authenticate|verify your account|login link|sign-in to confirm/i.test(fullText)) {
+    score += 30;
+    flags.push({
+      label: 'Credential Harvesting / Password Reset',
+      explanation: 'Solicits user authentication credentials or directs user to a password reset flow.'
+    });
+  }
+
+  if (/account (will be|has been|is) suspended|deactivated|locked out|service termination|access revoked|permanently closed|account disabled/i.test(fullText)) {
     score += 25;
     flags.push({
-      label: 'Domain Mismatch / Executive Impersonation',
-      explanation: 'Sender claims to be internal IT/Executive support, but message originates from a public free email domain.'
+      label: 'Account Suspension Threat',
+      explanation: 'Threatens loss of account access or service termination if immediate action is not taken.'
     });
   }
 
-  if (/wire transfer|gift card|payroll|routing number|bitcoin|payment/i.test(text)) {
+  if (/(verify|auth|security|login|update|account|support|check)[-._a-z0-9]*\.(net|org|info|xyz|top|site|co|me|cc|biz|online)/i.test(senderLower) ||
+      /@(gmail|yahoo|hotmail|outlook)\.com/i.test(senderLower) && /bank|paypal|it support|hr department|ceo|security team/i.test(fullText) ||
+      /verify-auth-domain\.net|auth-check\.com|login-verify\.net/i.test(senderLower)) {
+    score += 25;
+    flags.push({
+      label: 'Suspicious / Lookalike Domain',
+      explanation: `Sender domain (${sender || 'unverified'}) matches known spoofed security pattern or untrusted TLD.`
+    });
+  }
+
+  if (/https?:\/\/|\bclick here\b|\blogin link\b|\bbit\.ly\b|\btinyurl\b|\bverify link\b/i.test(fullText)) {
+    score += 20;
+    flags.push({
+      label: 'Suspicious External Action Link',
+      explanation: 'Contains embedded hyper-links prompting the recipient to navigate outside secure corporate boundaries.'
+    });
+  }
+
+  if (/security team|it department|helpdesk|system administrator|info-sec|global admin/i.test(fullText)) {
+    score += 15;
+    flags.push({
+      label: 'IT & Security Team Impersonation',
+      explanation: 'Claims authority as official internal IT/Security operations to build false credibility.'
+    });
+  }
+
+  if (/wire transfer|gift card|payroll|routing number|bitcoin|invoice payment/i.test(fullText)) {
     score += 20;
     flags.push({
       label: 'Financial Diversion Attempt',
-      explanation: 'Requests emergency financial transfer, gift card purchase, or bank details modification.'
+      explanation: 'Contains financial transaction keywords associated with BEC (Business Email Compromise).'
     });
   }
 
@@ -194,10 +222,10 @@ export function processMockPhishing(message, sender = '', subject = '') {
 
   if (score >= 80) {
     riskLevel = 'critical';
-    recommendation = 'CRITICAL RISK: Do not click any links or reply. Report this email immediately to your Security Operations Center (SOC).';
+    recommendation = 'CRITICAL RISK: Do not click any links or enter credentials. Report this email immediately to your Security Operations Center (SOC).';
   } else if (score >= 60) {
     riskLevel = 'high';
-    recommendation = 'HIGH RISK: Highly suspicious message. Verify the sender identity through an out-of-band channel (e.g. phone call).';
+    recommendation = 'HIGH RISK: Highly suspicious phishing markers detected. Do not click embedded links. Verify sender out-of-band.';
   } else if (score >= 35) {
     riskLevel = 'medium';
     recommendation = 'MEDIUM RISK: Inspect links carefully before clicking. Verify sender domain validity.';
