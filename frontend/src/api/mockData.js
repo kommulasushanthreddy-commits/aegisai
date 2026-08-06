@@ -42,30 +42,75 @@ export function processMockRedaction(prompt) {
   const entities = [];
   let maskedPrompt = prompt;
 
-  // Patterns for PII / Secrets / Internal references
   const patterns = [
+    // 1. Email Addresses
     { type: 'EMAIL', regex: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g },
-    { type: 'API_KEY', regex: /\b(sk-[A-Za-z0-9]{32,}|ghp_[A-Za-z0-9]{36}|AIzaSy[A-Za-z0-9_-]{33})\b/g },
-    { type: 'SSN_CREDENTIAL', regex: /\b\d{3}-\d{2}-\d{4}\b|\b4[0-9]{12}(?:[0-9]{3})?\b/g },
-    { type: 'PERSON', regex: /\b(Sarah Connor|John Doe|Jane Smith|Alex Vance|Michael Scott|Elon Musk|CEO Smith)\b/g },
-    { type: 'INTERNAL_ORG', regex: /\b(Project Titan|AcmeCorp|Database Server 10\.0\.4\.15|Q3 Financial Model|Dunder-Mipex|Confidential Vault)\b/gi },
+
+    // 2. Phone Numbers
     { type: 'PHONE', regex: /\b(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/g },
+
+    // 3. GitHub Tokens (ghp_, github_pat_, gho_, ghu_, ghs_, ghr_)
+    { type: 'API_KEY', regex: /\b(ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{82}|gho_[A-Za-z0-9]{36}|ghu_[A-Za-z0-9]{36}|ghs_[A-Za-z0-9]{36}|ghr_[A-Za-z0-9]{36})\b/g },
+
+    // 4. OpenAI, Anthropic, Google & AWS Access Keys
+    { type: 'API_KEY', regex: /\b(sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|AIzaSy[A-Za-z0-9_-]{33})\b/g },
+
+    // 5. AWS Secret Keys & Explicit Secret Assignments
+    { type: 'API_KEY', regex: /(?:aws_secret_access_key|aws_secret|secret_key)\s*[:=]\s*['"]?([A-Za-z0-9/+=]{40})['"]?/gi },
+
+    // 6. DB Connection URIs (mongodb://user:password@host, postgres://user:password@host)
+    { type: 'SSN_CREDENTIAL', regex: /\b(?:mongodb(?:\+srv)?|postgres(?:ql)?|mysql|redis|mssql):\/\/[A-Za-z0-9_%-]+:([^\s@]+)@[A-Za-z0-9._%-]+(?::\d+)?\/[A-Za-z0-9._%-]*/gi },
+
+    // 7. Database Passwords & JWT Secrets (DB_PASSWORD=..., JWT_SECRET=..., password=...)
+    { type: 'SSN_CREDENTIAL', regex: /(?:DB_PASSWORD|POSTGRES_PASSWORD|MYSQL_PASSWORD|REDIS_PASSWORD|PASSWORD|PASS|PWD|JWT_SECRET|SECRET_KEY|CLIENT_SECRET)\s*[:=]\s*['"]?([^\s'"\n;,]{3,})['"]?/gi },
+
+    // 8. Generic API_KEY / TOKEN variable assignments (API_KEY=..., TOKEN=...)
+    { type: 'API_KEY', regex: /(?:API_KEY|ACCESS_TOKEN|AUTH_TOKEN|PRIVATE_KEY)\s*[:=]\s*['"]?([A-Za-z0-9_\-.~+/=]{8,})['"]?/gi },
+
+    // 9. Internal URLs & Server Hostnames (http://internal.acme.corp, http://localhost:8080, http://10.0.4.15)
+    { type: 'INTERNAL_ORG', regex: /\bhttps?:\/\/(?:localhost|127\.0\.0\.1|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|[A-Za-z0-9_-]+\.internal|[A-Za-z0-9_-]+\.local|[A-Za-z0-9_-]+\.acme\.corp)(?::\d+)?(?:\/[^\s]*)?\b/gi },
+
+    // 10. Internal IP Addresses
+    { type: 'INTERNAL_ORG', regex: /\b(?:10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3})\b/g },
+
+    // 11. Confidential Notes & Document Markers
+    { type: 'INTERNAL_ORG', regex: /\b(CONFIDENTIAL NOTE|STRICTLY CONFIDENTIAL|CONFIDENTIAL|INTERNAL ONLY|RESTRICTED|PROPRIETARY|CLASSIFIED|DO NOT SHARE|DO NOT DISTRIBUTE)\b.*/gi },
+
+    // 12. SSN & Credit Card Numbers
+    { type: 'SSN_CREDENTIAL', regex: /\b\d{3}-\d{2}-\d{4}\b|\b4[0-9]{12}(?:[0-9]{3})?\b/g },
+
+    // 13. Named Individuals & Project Codenames
+    { type: 'PERSON', regex: /\b(Sarah Connor|John Doe|Jane Smith|Alex Vance|Michael Scott|Elon Musk|CEO Smith)\b/g },
+    { type: 'INTERNAL_ORG', regex: /\b(Project Titan|AcmeCorp|Database Server|Q3 Financial Model|Dunder-Mipex|Confidential Vault)\b/gi },
   ];
 
   patterns.forEach(({ type, regex }) => {
     let match;
+    regex.lastIndex = 0;
     while ((match = regex.exec(prompt)) !== null) {
-      const matchedText = match[0];
-      const start = match.index;
-      const end = start + matchedText.length;
-      
-      // Avoid duplicates
-      if (!entities.some(e => e.span[0] === start && e.span[1] === end)) {
-        entities.push({
-          text: matchedText,
-          type,
-          span: [start, end]
-        });
+      let matchedText = match[0];
+      let start = match.index;
+      let end = start + matchedText.length;
+
+      if (match.length > 1 && match[1]) {
+        const secretVal = match[1];
+        const secretStart = start + matchedText.indexOf(secretVal);
+        const secretEnd = secretStart + secretVal.length;
+        if (!entities.some(e => e.span[0] === secretStart && e.span[1] === secretEnd)) {
+          entities.push({
+            text: secretVal,
+            type,
+            span: [secretStart, secretEnd]
+          });
+        }
+      } else {
+        if (!entities.some(e => e.span[0] === start && e.span[1] === end)) {
+          entities.push({
+            text: matchedText,
+            type,
+            span: [start, end]
+          });
+        }
       }
     }
   });
@@ -77,10 +122,8 @@ export function processMockRedaction(prompt) {
     maskedPrompt = maskedPrompt.substring(0, entity.span[0]) + placeholder + maskedPrompt.substring(entity.span[1]);
   });
 
-  // Generate plausible masked AI response
-  const aiResponseMasked = `Based on the parameters provided for [REDACTED_INTERNAL_ORG], here is the optimized algorithm summary. Ensure all access keys such as [REDACTED_API_KEY] are stored in an encrypted vault, and contact [REDACTED_PERSON] ([REDACTED_EMAIL]) for compliance sign-off.`;
+  const aiResponseMasked = `Processed query safely. All sensitive credentials, tokens, and internal references have been masked.`;
 
-  // Unmasked AI response for original submitter
   let aiResponseUnmasked = aiResponseMasked;
   entities.forEach(e => {
     const placeholder = `[REDACTED_${e.type}]`;
@@ -100,7 +143,7 @@ export function processMockRedaction(prompt) {
 export function processMockPhishing(message, sender = '', subject = '') {
   const text = `${subject} ${sender} ${message}`.toLowerCase();
   const flags = [];
-  let score = 15; // baseline low risk
+  let score = 15;
 
   if (/verify your account|account suspended|immediate action|within 24 hours|urgent/i.test(text)) {
     score += 35;
@@ -199,14 +242,6 @@ export const MOCK_HISTORY = [
     riskScore: 12,
     riskLevel: 'low',
     timestamp: '2026-08-05T09:20:00Z'
-  },
-  {
-    id: 'scn_105',
-    type: 'redaction',
-    summary: 'Employee review document containing PII & SSN',
-    entitiesFound: 5,
-    riskLevel: 'high',
-    timestamp: '2026-08-04T14:10:00Z'
   }
 ];
 
@@ -286,7 +321,6 @@ export function generateMockAuditLogs() {
   const items = actions.map((act, index) => {
     const idx = index + 1;
     const timestamp = new Date(Date.now() - (7 - idx) * 3600 * 1000).toISOString();
-    // Simulate SHA-256 hash chaining formula: hash = sha256(prevHash + idx + timestamp + action)
     const hash = mockSha256(`${prevHash}:${idx}:${timestamp}:${act.action}:${act.actor}`);
     const item = {
       index: idx,
@@ -308,7 +342,6 @@ export function generateMockAuditLogs() {
   };
 }
 
-// Simple deterministic hash helper for visual demonstration
 function mockSha256(str) {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
