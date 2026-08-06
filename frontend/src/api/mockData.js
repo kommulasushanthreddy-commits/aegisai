@@ -3,7 +3,6 @@
  * Generates realistic responses for Redaction, Phishing, Admin Stats, Anomalies, Audit Logs, and Auth.
  */
 
-// Initial mock users
 export const MOCK_USERS = [
   {
     id: 'usr_emp_01',
@@ -36,7 +35,6 @@ export const MOCK_USERS = [
 
 export const delay = (ms = 600) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Mock Redaction Processor
 export function processMockRedaction(prompt) {
   if (!prompt || typeof prompt !== 'string') {
     return {
@@ -50,21 +48,20 @@ export function processMockRedaction(prompt) {
   const rawEntities = [];
 
   const patterns = [
-    // 1. GitHub Tokens
-    { type: 'GITHUB_TOKEN', regex: /\b(ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{82}|gho_[A-Za-z0-9]{36}|ghu_[A-Za-z0-9]{36}|ghs_[A-Za-z0-9]{36}|ghr_[A-Za-z0-9]{36})\b/g },
-    { type: 'GITHUB_TOKEN', regex: /(?:github_token|gh_token|github_pat)\s*[:=]\s*['"]?([A-Za-z0-9_]{20,})['"]?/gi },
+    // 1. GitHub Tokens (ghp_..., github_pat_..., gho_..., ghu_..., ghs_..., ghr_...)
+    { type: 'GITHUB_TOKEN', regex: /(?:ghp_|github_pat_|gho_|ghu_|ghs_|ghr_)[A-Za-z0-9_-]{8,}/gi },
+    { type: 'GITHUB_TOKEN', regex: /(?:github_token|gh_token|github_pat|ghp)\s*[:=]\s*['"]?([A-Za-z0-9_]{8,})['"]?/gi },
 
     // 2. Google AI Studio & Gemini API Keys (AIzaSy..., AIza...)
-    { type: 'API_KEY', regex: /\bAIza[0-9A-Za-z_-]{31,40}\b/g },
-    { type: 'API_KEY', regex: /(?:GEMINI_API_KEY|GOOGLE_API_KEY|GEMINI_KEY|GOOGLE_KEY)\s*[:=]\s*['"]?([A-Za-z0-9_\-]{20,})['"]?/gi },
+    { type: 'API_KEY', regex: /AIza[0-9A-Za-z_-]{20,}/g },
+    { type: 'API_KEY', regex: /(?:GEMINI_API_KEY|GOOGLE_API_KEY|GEMINI_KEY|GOOGLE_KEY)\s*[:=]\s*['"]?([A-Za-z0-9_\-]{16,})['"]?/gi },
 
     // 3. OpenAI, Anthropic & AWS Access Key IDs
-    { type: 'API_KEY', regex: /\b(sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16})\b/g },
+    { type: 'API_KEY', regex: /(?:sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16})/g },
     { type: 'API_KEY', regex: /(?:OPENAI_API_KEY|ANTHROPIC_API_KEY|AWS_ACCESS_KEY_ID|AWS_KEY|API_KEY|APIKEY)\s*[:=]\s*['"]?([A-Za-z0-9_\-]{16,})['"]?/gi },
 
     // 4. AWS Secret Access Keys (aws_secret_access_key=... or 40-char string)
-    { type: 'API_KEY', regex: /(?:aws_secret_access_key|aws_secret_key|aws_secret|secret_access_key)\s*[:=]\s*['"]?([A-Za-z0-9/+=]{40})['"]?/gi },
-    { type: 'API_KEY', regex: /\b[A-Za-z0-9/+=]{40}\b/g },
+    { type: 'API_KEY', regex: /(?:aws_secret_access_key|aws_secret_key|aws_secret|secret_access_key)\s*[:=]\s*['"]?([A-Za-z0-9/+=]{30,})['"]?/gi },
 
     // 5. Emails
     { type: 'EMAIL', regex: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g },
@@ -152,7 +149,6 @@ export function processMockRedaction(prompt) {
   };
 }
 
-// Mock Phishing Analyzer
 export function processMockPhishing(message, sender = '', subject = '') {
   const text = `${subject} ${sender} ${message}`.toLowerCase();
   const flags = [];
@@ -222,7 +218,6 @@ export function processMockPhishing(message, sender = '', subject = '') {
   };
 }
 
-// Mock Historical Scans
 export const MOCK_HISTORY = [
   {
     id: 'scn_101',
@@ -258,7 +253,6 @@ export const MOCK_HISTORY = [
   }
 ];
 
-// Mock Admin Stats
 export const MOCK_ADMIN_STATS = {
   kpis: {
     totalScans: 1428,
@@ -283,7 +277,6 @@ export const MOCK_ADMIN_STATS = {
   ]
 };
 
-// Mock Anomalies
 export const MOCK_ANOMALIES = [
   {
     id: 'anm_801',
@@ -317,7 +310,6 @@ export const MOCK_ANOMALIES = [
   }
 ];
 
-// Mock Hash-Chained Audit Logs
 export function generateMockAuditLogs() {
   const initialHash = '00008f3a9b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e';
   const actions = [
