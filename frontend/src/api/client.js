@@ -7,7 +7,7 @@ const client = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000,
+  timeout: 35000, // 35 seconds to allow Render free tier cold-start
 });
 
 // Request Interceptor: Attach JWT Bearer Token
