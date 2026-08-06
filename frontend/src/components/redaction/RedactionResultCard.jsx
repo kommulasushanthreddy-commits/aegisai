@@ -102,7 +102,7 @@ const RedactionResultCard = ({ scanResult, onSendToAI, isSendingAI, aiResult }) 
             </span>
             <span className="text-[11px] text-teal-400 font-mono">FORWARDS TO AI GATEWAY</span>
           </div>
-          <div className="whitespace-pre-wrap font-mono text-sm text-teal-200 leading-relaxed bg-[#0a0d14] p-4 rounded-xl border border-teal-500/30 shadow-glow-teal min-h-[140px]">
+          <div className="whitespace-pre-wrap break-words font-mono text-sm text-teal-200 leading-relaxed bg-[#0a0d14] p-4 rounded-xl border border-teal-500/30 shadow-glow-teal min-h-[140px] overflow-x-auto">
             {maskedPrompt}
           </div>
         </div>

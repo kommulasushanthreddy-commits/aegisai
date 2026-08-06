@@ -6,7 +6,11 @@ import React from 'react';
 const EntityHighlighter = ({ text, entities = [] }) => {
   if (!text) return null;
   if (!entities || entities.length === 0) {
-    return <div className="whitespace-pre-wrap font-mono text-sm text-slate-300">{text}</div>;
+    return (
+      <div className="whitespace-pre-wrap break-words font-mono text-sm text-slate-300 leading-relaxed bg-[#0a0d14] p-4 rounded-xl border border-[#1e2638] min-h-[140px]">
+        {text}
+      </div>
+    );
   }
 
   // Sort entities by start position
@@ -56,7 +60,7 @@ const EntityHighlighter = ({ text, entities = [] }) => {
   }
 
   return (
-    <div className="whitespace-pre-wrap font-mono text-sm text-slate-200 leading-relaxed bg-[#0a0d14] p-4 rounded-xl border border-[#1e2638]">
+    <div className="whitespace-pre-wrap break-words font-mono text-sm text-slate-200 leading-relaxed bg-[#0a0d14] p-4 rounded-xl border border-[#1e2638] overflow-x-auto min-h-[140px]">
       {parts}
     </div>
   );
