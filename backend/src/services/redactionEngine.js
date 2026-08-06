@@ -1,7 +1,12 @@
 /**
- * AegisAI Prompt Redaction Security Engine
- * Comprehensive scanner for PII, API keys, credentials, database passwords,
- * JWT secrets, GitHub tokens, AWS secret keys, internal URLs/IPs, and confidential notes.
+ * AegisAI Prompt Redaction Security Engine (Bulletproof Scanner)
+ * Detects and masks:
+ * - GITHUB_TOKEN (ghp_..., github_pat_..., gho_..., ghu_..., ghs_..., ghr_...)
+ * - API_KEY (AIza..., AIzaSy..., sk-..., AKIA..., GEMINI_API_KEY=..., GOOGLE_API_KEY=...)
+ * - AWS_SECRET_KEY (aws_secret_access_key=..., 40-char secret keys)
+ * - CREDENTIAL_PASSWORD (DB_PASSWORD=..., JWT_SECRET=..., mongodb://user:pass@host)
+ * - INTERNAL_ORG (http://internal.acme.corp, 10.x.x.x, CONFIDENTIAL NOTE)
+ * - EMAIL & PHONE
  */
 
 export function scanAndRedactPrompt(prompt) {
@@ -14,86 +19,91 @@ export function scanAndRedactPrompt(prompt) {
     };
   }
 
-  const entities = [];
-  let maskedPrompt = prompt;
+  const rawEntities = [];
 
   const patterns = [
-    // 1. Email Addresses
+    // 1. GitHub Tokens (ghp_, github_pat_, gho_, ghu_, ghs_, ghr_)
+    { type: 'GITHUB_TOKEN', regex: /\b(ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{82}|gho_[A-Za-z0-9]{36}|ghu_[A-Za-z0-9]{36}|ghs_[A-Za-z0-9]{36}|ghr_[A-Za-z0-9]{36})\b/g },
+    { type: 'GITHUB_TOKEN', regex: /(?:github_token|gh_token|github_pat)\s*[:=]\s*['"]?([A-Za-z0-9_]{20,})['"]?/gi },
+
+    // 2. Google AI Studio & Gemini API Keys (AIzaSy..., AIza...)
+    { type: 'API_KEY', regex: /\bAIza[0-9A-Za-z_-]{31,40}\b/g },
+    { type: 'API_KEY', regex: /(?:GEMINI_API_KEY|GOOGLE_API_KEY|GEMINI_KEY|GOOGLE_KEY)\s*[:=]\s*['"]?([A-Za-z0-9_\-]{20,})['"]?/gi },
+
+    // 3. OpenAI, Anthropic & AWS Access Key IDs
+    { type: 'API_KEY', regex: /\b(sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16})\b/g },
+    { type: 'API_KEY', regex: /(?:OPENAI_API_KEY|ANTHROPIC_API_KEY|AWS_ACCESS_KEY_ID|AWS_KEY|API_KEY|APIKEY)\s*[:=]\s*['"]?([A-Za-z0-9_\-]{16,})['"]?/gi },
+
+    // 4. AWS Secret Access Keys (aws_secret_access_key=... or 40-char string)
+    { type: 'API_KEY', regex: /(?:aws_secret_access_key|aws_secret_key|aws_secret|secret_access_key)\s*[:=]\s*['"]?([A-Za-z0-9/+=]{40})['"]?/gi },
+    { type: 'API_KEY', regex: /\b[A-Za-z0-9/+=]{40}\b/g },
+
+    // 5. Emails
     { type: 'EMAIL', regex: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g },
 
-    // 2. Phone Numbers
+    // 6. Phone Numbers
     { type: 'PHONE', regex: /\b(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/g },
 
-    // 3. GitHub Tokens (ghp_, github_pat_, gho_, ghu_, ghs_, ghr_)
-    { type: 'API_KEY', regex: /\b(ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{82}|gho_[A-Za-z0-9]{36}|ghu_[A-Za-z0-9]{36}|ghs_[A-Za-z0-9]{36}|ghr_[A-Za-z0-9]{36})\b/g },
+    // 7. Database Passwords & JWT Secrets (DB_PASSWORD=..., JWT_SECRET=..., password=...)
+    { type: 'SSN_CREDENTIAL', regex: /(?:DB_PASSWORD|POSTGRES_PASSWORD|MYSQL_PASSWORD|REDIS_PASSWORD|PASSWORD|PASS|PWD|JWT_SECRET|SECRET_KEY|CLIENT_SECRET|PRIVATE_KEY)\s*[:=]\s*['"]?([^\s'"\n;,]{3,})['"]?/gi },
 
-    // 4. OpenAI, Anthropic, Google & AWS Access Keys
-    { type: 'API_KEY', regex: /\b(sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|AIzaSy[A-Za-z0-9_-]{33})\b/g },
-
-    // 5. AWS Secret Keys & Explicit Secret Assignments
-    { type: 'API_KEY', regex: /(?:aws_secret_access_key|aws_secret|secret_key)\s*[:=]\s*['"]?([A-Za-z0-9/+=]{40})['"]?/gi },
-
-    // 6. DB Connection URIs (mongodb://user:password@host, postgres://user:password@host)
+    // 8. DB Connection String Credentials
     { type: 'SSN_CREDENTIAL', regex: /\b(?:mongodb(?:\+srv)?|postgres(?:ql)?|mysql|redis|mssql):\/\/[A-Za-z0-9_%-]+:([^\s@]+)@[A-Za-z0-9._%-]+(?::\d+)?\/[A-Za-z0-9._%-]*/gi },
 
-    // 7. Database Passwords & JWT Secrets (DB_PASSWORD=..., JWT_SECRET=..., password=...)
-    { type: 'SSN_CREDENTIAL', regex: /(?:DB_PASSWORD|POSTGRES_PASSWORD|MYSQL_PASSWORD|REDIS_PASSWORD|PASSWORD|PASS|PWD|JWT_SECRET|SECRET_KEY|CLIENT_SECRET)\s*[:=]\s*['"]?([^\s'"\n;,]{3,})['"]?/gi },
-
-    // 8. Generic API_KEY / TOKEN variable assignments (API_KEY=..., TOKEN=...)
-    { type: 'API_KEY', regex: /(?:API_KEY|ACCESS_TOKEN|AUTH_TOKEN|PRIVATE_KEY)\s*[:=]\s*['"]?([A-Za-z0-9_\-.~+/=]{8,})['"]?/gi },
-
-    // 9. Internal URLs & Server Hostnames (http://internal.acme.corp, http://localhost:8080, http://10.0.4.15)
+    // 9. Internal URLs & Server Hostnames
     { type: 'INTERNAL_ORG', regex: /\bhttps?:\/\/(?:localhost|127\.0\.0\.1|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|[A-Za-z0-9_-]+\.internal|[A-Za-z0-9_-]+\.local|[A-Za-z0-9_-]+\.acme\.corp)(?::\d+)?(?:\/[^\s]*)?\b/gi },
 
-    // 10. Internal IP Addresses
+    // 10. Internal IPs
     { type: 'INTERNAL_ORG', regex: /\b(?:10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3})\b/g },
 
     // 11. Confidential Notes & Document Markers
-    { type: 'INTERNAL_ORG', regex: /\b(CONFIDENTIAL NOTE|STRICTLY CONFIDENTIAL|CONFIDENTIAL|INTERNAL ONLY|RESTRICTED|PROPRIETARY|CLASSIFIED|DO NOT SHARE|DO NOT DISTRIBUTE)\b.*/gi },
+    { type: 'INTERNAL_ORG', regex: /\b(?:CONFIDENTIAL NOTE|STRICTLY CONFIDENTIAL|CONFIDENTIAL|INTERNAL ONLY|RESTRICTED|PROPRIETARY|CLASSIFIED|DO NOT SHARE|DO NOT DISTRIBUTE)\b[^\n]*/gi },
 
-    // 12. SSN & Credit Card Numbers
+    // 12. SSN & Credit Cards
     { type: 'SSN_CREDENTIAL', regex: /\b\d{3}-\d{2}-\d{4}\b|\b4[0-9]{12}(?:[0-9]{3})?\b/g },
 
-    // 13. Named Individuals & Project Codenames
+    // 13. Individuals & Codenames
     { type: 'PERSON', regex: /\b(Sarah Connor|John Doe|Jane Smith|Alex Vance|Michael Scott|Elon Musk|CEO Smith)\b/g },
     { type: 'INTERNAL_ORG', regex: /\b(Project Titan|AcmeCorp|Database Server|Q3 Financial Model|Dunder-Mipex|Confidential Vault)\b/gi },
   ];
 
   patterns.forEach(({ type, regex }) => {
-    let match;
-    // Reset regex index
     regex.lastIndex = 0;
+    let match;
     while ((match = regex.exec(prompt)) !== null) {
       let matchedText = match[0];
       let start = match.index;
       let end = start + matchedText.length;
 
-      // If the regex has a capture group (e.g. DB_PASSWORD=SuperSecure@123), extract the secret portion if applicable
       if (match.length > 1 && match[1]) {
-        const secretVal = match[1];
-        const secretStart = start + matchedText.indexOf(secretVal);
-        const secretEnd = secretStart + secretVal.length;
-        if (!entities.some(e => e.span[0] === secretStart && e.span[1] === secretEnd)) {
-          entities.push({
-            text: secretVal,
-            type,
-            span: [secretStart, secretEnd]
-          });
-        }
+        const captured = match[1];
+        const capStart = start + matchedText.indexOf(captured);
+        const capEnd = capStart + captured.length;
+        rawEntities.push({ text: captured, type, span: [capStart, capEnd] });
       } else {
-        if (!entities.some(e => e.span[0] === start && e.span[1] === end)) {
-          entities.push({
-            text: matchedText,
-            type,
-            span: [start, end]
-          });
-        }
+        rawEntities.push({ text: matchedText, type, span: [start, end] });
       }
     }
   });
 
-  // Sort descending by position for displacement-free string replacement
-  const sortedEntities = [...entities].sort((a, b) => b.span[0] - a.span[0]);
+  // Filter overlapping spans: prioritize longer or specific matches
+  const uniqueEntities = [];
+  rawEntities.sort((a, b) => a.span[0] - b.span[0] || (b.span[1] - b.span[0]) - (a.span[1] - a.span[0]));
+
+  for (const ent of rawEntities) {
+    const overlap = uniqueEntities.some(
+      existing => (ent.span[0] >= existing.span[0] && ent.span[0] < existing.span[1]) ||
+                  (ent.span[1] > existing.span[0] && ent.span[1] <= existing.span[1])
+    );
+    if (!overlap) {
+      uniqueEntities.push(ent);
+    }
+  }
+
+  // Sort descending by position for string substitution
+  let maskedPrompt = prompt;
+  const sortedEntities = [...uniqueEntities].sort((a, b) => b.span[0] - a.span[0]);
+
   sortedEntities.forEach(entity => {
     const placeholder = `[REDACTED_${entity.type}]`;
     maskedPrompt = maskedPrompt.substring(0, entity.span[0]) + placeholder + maskedPrompt.substring(entity.span[1]);
@@ -102,14 +112,14 @@ export function scanAndRedactPrompt(prompt) {
   const aiResponseMasked = `Processed query safely. All sensitive credentials, tokens, and internal references have been masked.`;
 
   let aiResponseUnmasked = aiResponseMasked;
-  entities.forEach(e => {
+  uniqueEntities.forEach(e => {
     const placeholder = `[REDACTED_${e.type}]`;
     aiResponseUnmasked = aiResponseUnmasked.replaceAll(placeholder, e.text);
   });
 
   return {
     maskedPrompt,
-    entities,
+    entities: uniqueEntities,
     aiResponseMasked,
     aiResponseUnmasked
   };

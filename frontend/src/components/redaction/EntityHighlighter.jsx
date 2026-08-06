@@ -16,11 +16,12 @@ const EntityHighlighter = ({ text, entities = [] }) => {
 
   const entityColorMap = {
     EMAIL: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
-    API_KEY: 'bg-rose-500/20 text-rose-300 border-rose-500/40',
-    PERSON: 'bg-teal-500/20 text-teal-300 border-teal-500/40 shadow-glow-teal',
-    INTERNAL_ORG: 'bg-purple-500/20 text-purple-300 border-purple-500/40',
-    SSN_CREDENTIAL: 'bg-red-600/30 text-red-300 border-red-500/50',
     PHONE: 'bg-blue-500/20 text-blue-300 border-blue-500/40',
+    API_KEY: 'bg-rose-500/20 text-rose-300 border-rose-500/40 shadow-glow-red',
+    GITHUB_TOKEN: 'bg-purple-500/20 text-purple-300 border-purple-500/40 shadow-glow-teal',
+    PERSON: 'bg-teal-500/20 text-teal-300 border-teal-500/40 shadow-glow-teal',
+    INTERNAL_ORG: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
+    SSN_CREDENTIAL: 'bg-red-600/30 text-red-300 border-red-500/50',
   };
 
   sorted.forEach((entity, idx) => {
