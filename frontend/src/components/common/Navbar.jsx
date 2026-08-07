@@ -1,14 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Shield, Eye, ShieldAlert, History, LayoutDashboard, LogOut, Activity, Sparkles, BarChart2 } from 'lucide-react';
+import { Shield, Eye, ShieldAlert, History, LayoutDashboard, LogOut, Activity, Sparkles, BarChart2, Edit3 } from 'lucide-react';
 import { RoleBadge } from './Badge';
 import ThemeToggle from './ThemeToggle';
+import DisplayNameModal from './DisplayNameModal';
 
 const Navbar = () => {
   const { user, isAuthenticated, logout, role } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [isNameModalOpen, setIsNameModalOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -123,8 +125,16 @@ const Navbar = () => {
 
             {isAuthenticated ? (
               <div className="flex items-center space-x-3 pl-2 border-l border-slate-800">
+                <DisplayNameModal isOpen={isNameModalOpen} onClose={() => setIsNameModalOpen(false)} />
                 <div className="flex flex-col text-right hidden sm:flex">
-                  <span className="text-xs font-semibold text-slate-200">{user?.name}</span>
+                  <button
+                    onClick={() => setIsNameModalOpen(true)}
+                    title="Edit Display Name"
+                    className="text-xs font-semibold text-slate-200 hover:text-[#00D4FF] flex items-center gap-1 transition-colors group"
+                  >
+                    <span>{user?.name}</span>
+                    <Edit3 className="w-3 h-3 text-slate-400 group-hover:text-[#00D4FF] transition-colors" />
+                  </button>
                   <div className="flex items-center justify-end space-x-1">
                     <RoleBadge role={role} />
                   </div>

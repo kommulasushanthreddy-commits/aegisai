@@ -64,6 +64,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateDisplayName = (newName) => {
+    if (!newName || !newName.trim()) return;
+    const updatedUser = { ...user, name: newName.trim(), hasCustomName: true };
+    setUser(updatedUser);
+    localStorage.setItem('aegis_user', JSON.stringify(updatedUser));
+    return updatedUser;
+  };
+
   const logout = () => {
     setUser(null);
     setToken(null);
@@ -80,6 +88,7 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    updateDisplayName,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

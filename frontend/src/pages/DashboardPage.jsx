@@ -1,27 +1,46 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Shield, Eye, ShieldAlert, Lock, Activity, ArrowRight, TrendingUp, Sparkles, CheckCircle2, Play, FileText } from 'lucide-react';
+import { Shield, Eye, ShieldAlert, Lock, Activity, ArrowRight, TrendingUp, Sparkles, CheckCircle2, Play, FileText, Edit3 } from 'lucide-react';
 import SecurityScoreRing from '../components/dashboard/SecurityScoreRing';
 import AttackSourcesMap from '../components/dashboard/AttackSourcesMap';
 import AnalyticsCharts from '../components/dashboard/AnalyticsCharts';
 import RealTimeActivityFeed from '../components/dashboard/RealTimeActivityFeed';
 import ThreatTicker from '../components/common/ThreatTicker';
+import DisplayNameModal from '../components/common/DisplayNameModal';
 
 const DashboardPage = () => {
   const { user, role } = useAuth();
+  const [isNameModalOpen, setIsNameModalOpen] = useState(false);
+
+  // Automatically prompt for display name if user has not set a custom display name yet
+  useEffect(() => {
+    if (user && !user.hasCustomName) {
+      setIsNameModalOpen(true);
+    }
+  }, [user]);
 
   return (
     <div className="space-y-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       
+      {/* Interactive Display Name Modal */}
+      <DisplayNameModal isOpen={isNameModalOpen} onClose={() => setIsNameModalOpen(false)} />
+
       {/* Top Live Threat Ticker Banner */}
       <ThreatTicker />
 
       {/* 1. Premium Dashboard Header */}
       <div className="glass-card p-8 flex flex-wrap items-center justify-between gap-6">
         <div className="space-y-4">
-          <h1 className="text-3xl font-black text-slate-100 tracking-tight font-sans">
-            👋 Welcome back, {user?.name || 'Sushanth'}
+          <h1 className="text-3xl font-black text-slate-100 tracking-tight font-sans flex items-center gap-3">
+            <span>👋 Welcome back, {user?.name || 'User'}</span>
+            <button
+              onClick={() => setIsNameModalOpen(false) || setIsNameModalOpen(true)}
+              title="Change Display Name"
+              className="p-1.5 rounded-xl bg-slate-800/80 hover:bg-[#00D4FF]/20 border border-slate-700 text-slate-400 hover:text-[#00D4FF] transition-all"
+            >
+              <Edit3 className="w-4 h-4" />
+            </button>
           </h1>
 
           {/* Quick System Status Strip */}
