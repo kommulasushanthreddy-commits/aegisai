@@ -41,68 +41,68 @@ const Navbar = () => {
             </div>
           </Link>
 
-          {/* Navigation Links with Icons & Glow Highlights */}
+          {/* Navigation Links with Glowing Blue Active Pills */}
           {isAuthenticated && (
-            <div className="hidden md:flex items-center space-x-1.5 font-mono text-xs">
+            <div className="hidden md:flex items-center space-x-2 font-sans text-xs">
               <Link
                 to="/dashboard"
-                className={`px-3.5 py-2 rounded-xl font-semibold transition-all flex items-center space-x-2 ${
+                className={`px-4 py-2 rounded-xl font-bold transition-all flex items-center space-x-2 border ${
                   location.pathname === '/dashboard'
-                    ? 'bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/40 shadow-glow-cyan'
-                    : 'text-slate-300 hover:bg-[#111827] hover:text-slate-100'
+                    ? 'bg-[#3B82F6]/15 text-[#3B82F6] border-[#3B82F6]/50 shadow-glow-cyan'
+                    : 'text-slate-300 border-transparent hover:bg-[#111827] hover:text-slate-100 hover:border-slate-800'
                 }`}
               >
-                <LayoutDashboard className="w-4 h-4 text-[#00D4FF]" />
-                <span>🏠 Dashboard</span>
+                <LayoutDashboard className="w-4 h-4 text-[#3B82F6]" />
+                <span>Dashboard</span>
               </Link>
 
               <Link
                 to="/scan/redaction"
-                className={`px-3.5 py-2 rounded-xl font-semibold transition-all flex items-center space-x-2 ${
+                className={`px-4 py-2 rounded-xl font-bold transition-all flex items-center space-x-2 border ${
                   isActive('/scan/redaction')
-                    ? 'bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/40 shadow-glow-cyan'
-                    : 'text-slate-300 hover:bg-[#111827] hover:text-slate-100'
+                    ? 'bg-[#06B6D4]/15 text-[#06B6D4] border-[#06B6D4]/50 shadow-glow-cyan'
+                    : 'text-slate-300 border-transparent hover:bg-[#111827] hover:text-slate-100 hover:border-slate-800'
                 }`}
               >
-                <Eye className="w-4 h-4 text-cyan-400" />
-                <span>🛡️ Shield</span>
+                <Eye className="w-4 h-4 text-[#06B6D4]" />
+                <span>Redaction Shield</span>
               </Link>
 
               <Link
                 to="/scan/phishing"
-                className={`px-3.5 py-2 rounded-xl font-semibold transition-all flex items-center space-x-2 ${
+                className={`px-4 py-2 rounded-xl font-bold transition-all flex items-center space-x-2 border ${
                   isActive('/scan/phishing')
-                    ? 'bg-[#FACC15]/10 text-[#FACC15] border border-[#FACC15]/40 shadow-glow-yellow'
-                    : 'text-slate-300 hover:bg-[#111827] hover:text-slate-100'
+                    ? 'bg-[#F59E0B]/15 text-[#F59E0B] border-[#F59E0B]/50 shadow-glow-yellow'
+                    : 'text-slate-300 border-transparent hover:bg-[#111827] hover:text-slate-100 hover:border-slate-800'
                 }`}
               >
-                <ShieldAlert className="w-4 h-4 text-amber-400" />
-                <span>📧 Phishing</span>
+                <ShieldAlert className="w-4 h-4 text-[#F59E0B]" />
+                <span>Phishing Analyzer</span>
               </Link>
 
               <Link
                 to="/history"
-                className={`px-3.5 py-2 rounded-xl font-semibold transition-all flex items-center space-x-2 ${
+                className={`px-4 py-2 rounded-xl font-bold transition-all flex items-center space-x-2 border ${
                   isActive('/history')
-                    ? 'bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/40 shadow-glow-cyan'
-                    : 'text-slate-300 hover:bg-[#111827] hover:text-slate-100'
+                    ? 'bg-[#22C55E]/15 text-[#22C55E] border-[#22C55E]/50 shadow-glow-green'
+                    : 'text-slate-300 border-transparent hover:bg-[#111827] hover:text-slate-100 hover:border-slate-800'
                 }`}
               >
-                <History className="w-4 h-4 text-emerald-400" />
-                <span>📜 History</span>
+                <History className="w-4 h-4 text-[#22C55E]" />
+                <span>Scan History</span>
               </Link>
 
               {role === 'admin' && (
                 <Link
                   to="/admin"
-                  className={`px-3.5 py-2 rounded-xl font-semibold transition-all flex items-center space-x-2 ${
+                  className={`px-4 py-2 rounded-xl font-bold transition-all flex items-center space-x-2 border ${
                     isActive('/admin')
-                      ? 'bg-purple-500/10 text-purple-300 border border-purple-500/40 shadow-glow-indigo'
-                      : 'text-slate-300 hover:bg-[#111827] hover:text-slate-100'
+                      ? 'bg-purple-500/15 text-purple-300 border-purple-500/50 shadow-glow-indigo'
+                      : 'text-slate-300 border-transparent hover:bg-[#111827] hover:text-slate-100 hover:border-slate-800'
                   }`}
                 >
                   <BarChart2 className="w-4 h-4 text-purple-400" />
-                  <span>📊 Analytics</span>
+                  <span>SOC Analytics</span>
                 </Link>
               )}
             </div>

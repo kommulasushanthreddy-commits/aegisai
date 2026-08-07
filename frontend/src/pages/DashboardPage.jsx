@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Shield, Eye, ShieldAlert, Lock, Activity, ArrowRight, TrendingUp, Sparkles, CheckCircle2, Play, FileText, Edit3 } from 'lucide-react';
+import { Shield, Eye, ShieldAlert, Lock, Activity, ArrowRight, TrendingUp, TrendingDown, Sparkles, CheckCircle2, Play, FileText, Edit3, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import SecurityScoreRing from '../components/dashboard/SecurityScoreRing';
 import AttackSourcesMap from '../components/dashboard/AttackSourcesMap';
 import AnalyticsCharts from '../components/dashboard/AnalyticsCharts';
 import RealTimeActivityFeed from '../components/dashboard/RealTimeActivityFeed';
+import ThreatGaugeWidget from '../components/dashboard/ThreatGaugeWidget';
+import ThreatDistributionWidget from '../components/dashboard/ThreatDistributionWidget';
 import ThreatTicker from '../components/common/ThreatTicker';
 import DisplayNameModal from '../components/common/DisplayNameModal';
 
@@ -13,7 +15,7 @@ const DashboardPage = () => {
   const { user, role } = useAuth();
   const [isNameModalOpen, setIsNameModalOpen] = useState(false);
 
-  // Automatically prompt for display name if user has not set a custom display name yet
+  // Prompt for display name if user has not set a custom display name yet
   useEffect(() => {
     if (user && !user.hasCustomName) {
       setIsNameModalOpen(true);
@@ -21,7 +23,7 @@ const DashboardPage = () => {
   }, [user]);
 
   return (
-    <div className="space-y-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fadeIn">
       
       {/* Interactive Display Name Modal */}
       <DisplayNameModal isOpen={isNameModalOpen} onClose={() => setIsNameModalOpen(false)} />
@@ -29,15 +31,15 @@ const DashboardPage = () => {
       {/* Top Live Threat Ticker Banner */}
       <ThreatTicker />
 
-      {/* 1. Premium Dashboard Header */}
+      {/* 1. Premium CrowdStrike / Microsoft Defender Style Dashboard Header */}
       <div className="glass-card p-8 flex flex-wrap items-center justify-between gap-6">
         <div className="space-y-4">
           <h1 className="text-3xl font-black text-slate-100 tracking-tight font-sans flex items-center gap-3">
             <span>👋 Welcome back, {user?.name || 'User'}</span>
             <button
-              onClick={() => setIsNameModalOpen(false) || setIsNameModalOpen(true)}
+              onClick={() => setIsNameModalOpen(true)}
               title="Change Display Name"
-              className="p-1.5 rounded-xl bg-slate-800/80 hover:bg-[#00D4FF]/20 border border-slate-700 text-slate-400 hover:text-[#00D4FF] transition-all"
+              className="p-1.5 rounded-xl bg-[#1F2937]/80 hover:bg-[#06B6D4]/20 border border-[#374151] text-slate-400 hover:text-[#06B6D4] transition-all"
             >
               <Edit3 className="w-4 h-4" />
             </button>
@@ -53,16 +55,16 @@ const DashboardPage = () => {
               <span>System Status: 🟢 Protected</span>
             </div>
 
-            <div className="px-3 py-1 rounded-full bg-[#6366F1]/10 border border-[#6366F1]/30 text-[#6366F1] font-bold">
+            <div className="px-3.5 py-1 rounded-full bg-[#3B82F6]/10 border border-[#3B82F6]/30 text-[#3B82F6] font-bold">
               Threat Level: Low
             </div>
 
-            <div className="px-3 py-1 rounded-full bg-slate-800/60 border border-slate-700/50 text-[#9CA3AF]">
-              Last Scan: 2 min ago
+            <div className="px-3.5 py-1 rounded-full bg-[#1F2937]/80 border border-[#374151] text-[#9CA3AF]">
+              Last Telemetry Sync: 2 min ago
             </div>
           </div>
 
-          {/* Header Buttons */}
+          {/* Header Action Buttons */}
           <div className="flex flex-wrap items-center gap-3 pt-1">
             <Link to="/scan/redaction" className="btn-primary">
               <Play className="w-4 h-4 fill-slate-950" />
@@ -76,130 +78,117 @@ const DashboardPage = () => {
         </div>
 
         {/* Security Score Ring */}
-        <div className="p-4 rounded-2xl bg-[#09090B]/80 border border-white/10 shadow-glow-cyan">
+        <div className="p-4 rounded-2xl bg-[#081018]/90 border border-[#1F2937] shadow-glow-cyan">
           <SecurityScoreRing score={98} />
         </div>
       </div>
 
-      {/* 2. Four KPI Cards */}
+      {/* 2. Four Premium KPI Cards with Sparkline Charts */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
         {/* KPI 1: Threats Blocked */}
         <div className="glass-card p-6 space-y-3 hover:border-[#EF4444]/40">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-[#9CA3AF] uppercase tracking-wider">Threats Blocked</span>
-            <div className="w-10 h-10 rounded-xl bg-[#EF4444]/10 text-[#EF4444] border border-[#EF4444]/30 flex items-center justify-center">
+            <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">Threats Blocked</span>
+            <div className="w-10 h-10 rounded-xl bg-[#EF4444]/15 text-[#EF4444] border border-[#EF4444]/30 flex items-center justify-center">
               <ShieldAlert className="w-5 h-5" />
             </div>
           </div>
-          <div className="text-3xl font-black text-slate-100 font-mono">1,428</div>
-          <p className="text-xs text-[#22C55E] font-mono flex items-center gap-1">
-            <TrendingUp className="w-3.5 h-3.5" /> +12% vs last week
-          </p>
+          <div className="flex items-baseline justify-between">
+            <div className="text-3xl font-black text-slate-100 font-mono">1,428</div>
+            {/* Sparkline Chart */}
+            <svg className="w-16 h-8" viewBox="0 0 60 30">
+              <polyline fill="none" stroke="#EF4444" strokeWidth="2.5" points="0,25 15,18 30,22 45,10 60,5" />
+            </svg>
+          </div>
+          <div className="flex items-center justify-between text-xs font-mono pt-1">
+            <span className="text-[#22C55E] font-bold flex items-center gap-1">
+              <ArrowUpRight className="w-3.5 h-3.5" /> +12% this week
+            </span>
+            <span className="text-[#9CA3AF]">99.8% precision</span>
+          </div>
         </div>
 
         {/* KPI 2: Secrets Masked */}
-        <div className="glass-card p-6 space-y-3 hover:border-[#00D4FF]/40">
+        <div className="glass-card p-6 space-y-3 hover:border-[#06B6D4]/40">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-[#9CA3AF] uppercase tracking-wider">Secrets Masked</span>
-            <div className="w-10 h-10 rounded-xl bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/30 flex items-center justify-center">
+            <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">Secrets Masked</span>
+            <div className="w-10 h-10 rounded-xl bg-[#06B6D4]/15 text-[#06B6D4] border border-[#06B6D4]/30 flex items-center justify-center">
               <Lock className="w-5 h-5" />
             </div>
           </div>
-          <div className="text-3xl font-black text-slate-100 font-mono">12,543</div>
-          <p className="text-xs text-[#00D4FF] font-mono flex items-center gap-1">
-            <TrendingUp className="w-3.5 h-3.5" /> +24% vs last week
-          </p>
+          <div className="flex items-baseline justify-between">
+            <div className="text-3xl font-black text-slate-100 font-mono">12,543</div>
+            {/* Sparkline Chart */}
+            <svg className="w-16 h-8" viewBox="0 0 60 30">
+              <polyline fill="none" stroke="#06B6D4" strokeWidth="2.5" points="0,28 15,20 30,15 45,8 60,3" />
+            </svg>
+          </div>
+          <div className="flex items-center justify-between text-xs font-mono pt-1">
+            <span className="text-[#06B6D4] font-bold flex items-center gap-1">
+              <ArrowUpRight className="w-3.5 h-3.5" /> +24% this week
+            </span>
+            <span className="text-[#9CA3AF]">Zero leakage</span>
+          </div>
         </div>
 
         {/* KPI 3: Suspicious Emails */}
-        <div className="glass-card p-6 space-y-3 hover:border-[#FACC15]/40">
+        <div className="glass-card p-6 space-y-3 hover:border-[#F59E0B]/40">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-[#9CA3AF] uppercase tracking-wider">Suspicious Emails</span>
-            <div className="w-10 h-10 rounded-xl bg-[#FACC15]/10 text-[#FACC15] border border-[#FACC15]/30 flex items-center justify-center">
+            <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">Suspicious Emails</span>
+            <div className="w-10 h-10 rounded-xl bg-[#F59E0B]/15 text-[#F59E0B] border border-[#F59E0B]/30 flex items-center justify-center">
               <Eye className="w-5 h-5" />
             </div>
           </div>
-          <div className="text-3xl font-black text-slate-100 font-mono">184</div>
-          <p className="text-xs text-[#FACC15] font-mono">
-            -5% vs last week
-          </p>
+          <div className="flex items-baseline justify-between">
+            <div className="text-3xl font-black text-slate-100 font-mono">184</div>
+            {/* Sparkline Chart */}
+            <svg className="w-16 h-8" viewBox="0 0 60 30">
+              <polyline fill="none" stroke="#F59E0B" strokeWidth="2.5" points="0,10 15,22 30,14 45,20 60,26" />
+            </svg>
+          </div>
+          <div className="flex items-center justify-between text-xs font-mono pt-1">
+            <span className="text-[#22C55E] font-bold flex items-center gap-1">
+              <ArrowDownRight className="w-3.5 h-3.5" /> -5% reduction
+            </span>
+            <span className="text-[#9CA3AF]">9 vectors</span>
+          </div>
         </div>
 
         {/* KPI 4: Risk Score */}
         <div className="glass-card p-6 space-y-3 hover:border-[#22C55E]/40">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-[#9CA3AF] uppercase tracking-wider">Risk Score</span>
-            <div className="w-10 h-10 rounded-xl bg-[#22C55E]/10 text-[#22C55E] border border-[#22C55E]/30 flex items-center justify-center">
+            <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">Risk Score</span>
+            <div className="w-10 h-10 rounded-xl bg-[#22C55E]/15 text-[#22C55E] border border-[#22C55E]/30 flex items-center justify-center">
               <CheckCircle2 className="w-5 h-5" />
             </div>
           </div>
-          <div className="text-3xl font-black text-[#22C55E] font-mono">12 / 100</div>
-          <p className="text-xs text-[#22C55E] font-mono">
-            -8 pts risk reduction
-          </p>
-        </div>
-
-      </div>
-
-      {/* 4. Threat Detection Line Chart + World Attack Sources Map */}
-      <div className="space-y-8">
-        <AnalyticsCharts />
-        <AttackSourcesMap />
-      </div>
-
-      {/* 5. Scanner Action Cards (Prompt Shield + Phishing Analyzer) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        
-        {/* Prompt Shield */}
-        <div className="glass-card p-8 flex flex-col justify-between space-y-6 hover:border-[#00D4FF]/40">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="w-12 h-12 rounded-2xl bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/30 flex items-center justify-center shadow-glow-cyan">
-                <Eye className="w-6 h-6" />
-              </div>
-              <span className="text-xs font-mono px-3 py-1 rounded-full bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/30 font-bold">
-                12,543 Secrets Protected
-              </span>
-            </div>
-            <h2 className="text-2xl font-black text-slate-100 tracking-tight">🛡️ Prompt Redaction Shield</h2>
-            <p className="text-sm text-[#9CA3AF] leading-relaxed">
-              Detects API keys, PII, and credentials in prompts and replaces them with safe tokens before LLM dispatch.
-            </p>
+          <div className="flex items-baseline justify-between">
+            <div className="text-3xl font-black text-[#22C55E] font-mono">12 / 100</div>
+            {/* Sparkline Chart */}
+            <svg className="w-16 h-8" viewBox="0 0 60 30">
+              <polyline fill="none" stroke="#22C55E" strokeWidth="2.5" points="0,8 15,12 30,18 45,24 60,28" />
+            </svg>
           </div>
-
-          <Link to="/scan/redaction" className="btn-primary">
-            <span>[ Launch Redaction Scanner ]</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-
-        {/* Phishing Analyzer */}
-        <div className="glass-card p-8 flex flex-col justify-between space-y-6 hover:border-[#FACC15]/40">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="w-12 h-12 rounded-2xl bg-[#FACC15]/10 text-[#FACC15] border border-[#FACC15]/30 flex items-center justify-center shadow-glow-yellow">
-                <ShieldAlert className="w-6 h-6" />
-              </div>
-              <span className="text-xs font-mono px-3 py-1 rounded-full bg-[#FACC15]/10 text-[#FACC15] border border-[#FACC15]/30 font-bold">
-                184 Threats Intercepted
-              </span>
-            </div>
-            <h2 className="text-2xl font-black text-slate-100 tracking-tight">📧 Phishing & Threat Analyzer</h2>
-            <p className="text-sm text-[#9CA3AF] leading-relaxed">
-              Analyze suspicious emails or urgency requests with 9-vector risk scoring and explainable evidence flags.
-            </p>
+          <div className="flex items-center justify-between text-xs font-mono pt-1">
+            <span className="text-[#22C55E] font-bold flex items-center gap-1">
+              <ArrowDownRight className="w-3.5 h-3.5" /> -8 pts risk
+            </span>
+            <span className="text-[#9CA3AF]">Low Exposure</span>
           </div>
-
-          <Link to="/scan/phishing" className="btn-secondary">
-            <span>[ Analyze Suspicious Message ]</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
         </div>
 
       </div>
 
-      {/* 6. Real-Time Security Activity Feed */}
+      {/* 3. Global Threat Intelligence Centerpiece Map */}
+      <AttackSourcesMap />
+
+      {/* 4. Threat Level Gauge & Distribution Widgets */}
+      <ThreatGaugeWidget />
+      <ThreatDistributionWidget />
+
+      {/* 5. Analytics Charts & Real-Time Security Activity Feed */}
+      <AnalyticsCharts />
       <RealTimeActivityFeed />
 
     </div>
