@@ -12,7 +12,7 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('AegisAI UI ErrorBoundary caught an error:', error, errorInfo);
+    console.error('Shield AI UI ErrorBoundary caught an error:', error, errorInfo);
   }
 
   handleReload = () => {

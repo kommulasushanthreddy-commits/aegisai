@@ -14,7 +14,7 @@ const SecurityFlowDiagram = () => {
     },
     {
       step: 2,
-      title: '2. AegisAI Gateway',
+      title: '2. Shield AI Gateway',
       desc: 'Multi-pass regex & NLP detects sensitive entities and replaces with safe tokens.',
       color: 'border-teal-500/50 bg-teal-500/10 text-teal-300 shadow-glow-teal',
       badge: 'Zero-Trust Intercept'
@@ -43,7 +43,7 @@ const SecurityFlowDiagram = () => {
         <div>
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-teal-400 animate-ping"></span>
-            <h3 className="text-xl font-bold text-slate-100">Live AegisAI Security Gateway Architecture</h3>
+            <h3 className="text-xl font-bold text-slate-100">Live Shield AI Security Gateway Architecture</h3>
           </div>
           <p className="text-xs text-slate-400 mt-1">
             Visual pipeline demonstrating inline prompt interception before data leaves the corporate perimeter.

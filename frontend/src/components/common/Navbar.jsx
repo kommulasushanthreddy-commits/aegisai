@@ -31,7 +31,7 @@ const Navbar = () => {
             </div>
             <div className="flex flex-col">
               <span className="text-lg font-black tracking-tight text-slate-100 flex items-center gap-1">
-                Aegis<span className="text-[#00D4FF]">AI</span>
+                Shield <span className="text-[#00D4FF]">AI</span>
               </span>
               <span className="text-[10px] text-slate-400 tracking-wider font-mono uppercase -mt-1">
                 Security Gateway

@@ -67,7 +67,7 @@ const LoginPage = () => {
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-400 to-teal-700 mx-auto flex items-center justify-center text-slate-950 font-bold shadow-glow-teal">
             <Shield className="w-7 h-7 fill-slate-950 stroke-slate-950" />
           </div>
-          <h2 className="text-2xl font-bold text-slate-100">Access AegisAI Console</h2>
+          <h2 className="text-2xl font-bold text-slate-100">Access Shield AI Console</h2>
           <p className="text-xs text-slate-400">Enter your credentials to manage AI security policy</p>
         </div>
 

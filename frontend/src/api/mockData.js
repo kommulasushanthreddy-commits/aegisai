@@ -1,5 +1,5 @@
 /**
- * AegisAI Mock Data Layer
+ * Shield AI Mock Data Layer
  * Generates realistic responses for Redaction, Phishing, Admin Stats, Anomalies, Audit Logs, and Auth.
  */
 

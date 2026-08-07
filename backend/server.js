@@ -28,7 +28,7 @@ app.use(express.json());
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'HEALTHY',
-    service: 'AegisAI Gateway Backend',
+    service: 'Shield AI Gateway Backend',
     timestamp: new Date().toISOString()
   });
 });
@@ -54,7 +54,7 @@ app.use((err, req, res, next) => {
 async function startServer() {
   await connectDB();
   app.listen(PORT, () => {
-    console.log(`🛡️ AegisAI Security Gateway Backend listening on http://localhost:${PORT}`);
+    console.log(`🛡️ Shield AI Security Gateway Backend listening on http://localhost:${PORT}`);
   });
 }
 

@@ -1,11 +1,11 @@
-# AegisAI — Enterprise AI Security, Privacy & Trust Gateway
+# Shield AI — Enterprise AI Security, Privacy & Trust Gateway
 
 [![Hackathon Submission](https://img.shields.io/badge/Theme-AI%20Security%2C%20Privacy%20%26%20Trust-14b8a6?style=for-the-badge)](https://github.com)
 [![React 18](https://img.shields.io/badge/Frontend-React%2018%20%2B%20Vite-61dafb?style=for-the-badge)](https://reactjs.org/)
 [![Node.js Express](https://img.shields.io/badge/Backend-Node.js%20%2B%20Express-68a063?style=for-the-badge)](https://expressjs.com/)
 [![Cryptographic Audit](https://img.shields.io/badge/Audit-SHA--256%20Hash%20Chain-purple?style=for-the-badge)](https://github.com)
 
-AegisAI is an enterprise gateway that employees route their AI prompts and suspicious messages through. It redacts sensitive company data, credentials, and project codenames before prompts reach third-party LLMs, scores phishing messages with explainable red flags, flags behavioral anomalies, and writes all security operations to an append-only, tamper-evident SHA-256 hash-chained audit log.
+Shield AI is an enterprise gateway that employees route their AI prompts and suspicious messages through. It redacts sensitive company data, credentials, and project codenames before prompts reach third-party LLMs, scores phishing messages with explainable red flags, flags behavioral anomalies, and writes all security operations to an append-only, tamper-evident SHA-256 hash-chained audit log.
 
 ---
 

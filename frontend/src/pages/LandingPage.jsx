@@ -21,7 +21,7 @@ const LandingPage = () => {
         </h1>
 
         <p className="text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
-          Employees paste credentials and PII into AI tools daily. AegisAI sits between your workforce and public AI models — redacting sensitive entities, analyzing phishing threats, and maintaining a tamper-evident audit log.
+          Employees paste credentials and PII into AI tools daily. Shield AI sits between your workforce and public AI models — redacting sensitive entities, analyzing phishing threats, and maintaining a tamper-evident audit log.
         </p>
 
         {/* Hero Quick Statistics Bar */}
@@ -79,7 +79,7 @@ const LandingPage = () => {
               Live Interactive Demonstration: Prompt Redaction Shield
             </h3>
             <p className="text-xs text-slate-400 mt-1">
-              Watch AegisAI automatically detect credentials and PII in real-time.
+              Watch Shield AI automatically detect credentials and PII in real-time.
             </p>
           </div>
           <AiBadge label="Redaction Shield Engine" />
@@ -112,7 +112,7 @@ const LandingPage = () => {
       {/* The Four Pillars Table / Grid */}
       <div className="space-y-10">
         <div className="text-center space-y-2">
-          <h2 className="text-3xl font-bold text-slate-100">The Four Pillars of AegisAI</h2>
+          <h2 className="text-3xl font-bold text-slate-100">The Four Pillars of Shield AI</h2>
           <p className="text-slate-400 max-w-xl mx-auto text-sm">
             Built from the ground up for complete organizational compliance, zero data leakage, and verified trust.
           </p>
