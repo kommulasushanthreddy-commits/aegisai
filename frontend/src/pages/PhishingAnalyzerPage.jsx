@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ShieldAlert, AlertTriangle, RefreshCw, Send, AlertCircle, FileText, CheckCircle2, Trash2 } from 'lucide-react';
 import { analyzePhishingMessage } from '../api/phishing';
+import { saveScanRecord } from '../utils/historyStorage';
 import RiskGauge from '../components/phishing/RiskGauge';
 import FlagExplanationList from '../components/phishing/FlagExplanationList';
 
@@ -68,6 +69,18 @@ const PhishingAnalyzerPage = () => {
     try {
       const data = await analyzePhishingMessage({ message, sender, subject });
       setAnalysisResult(data);
+
+      // Save to real user scan history
+      saveScanRecord({
+        type: 'phishing',
+        summary: subject ? `Subject: ${subject}` : (message.length > 60 ? `${message.substring(0, 60)}...` : message),
+        sender: sender || 'Unknown',
+        fullContent: message,
+        riskScore: data.riskScore,
+        riskLevel: data.riskLevel,
+        flags: data.flags || [],
+        recommendation: data.recommendation
+      });
     } catch (err) {
       setError('Analysis failed. Please try again.');
       console.error('Phishing analysis error:', err);

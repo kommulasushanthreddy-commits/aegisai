@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Eye, Shield, Sparkles, RefreshCw, AlertCircle, Play, FileCode, Check } from 'lucide-react';
 import { scanPromptRedaction, sendMaskedPromptToAI } from '../api/redaction';
+import { saveScanRecord } from '../utils/historyStorage';
 import RedactionResultCard from '../components/redaction/RedactionResultCard';
 import { AiBadge } from '../components/common/Badge';
 
@@ -47,6 +48,17 @@ const RedactionShieldPage = () => {
         entities: data.entities || [],
         aiResponseMasked: data.aiResponseMasked,
         aiResponseUnmasked: data.aiResponseUnmasked
+      });
+
+      // Save to real user scan history
+      saveScanRecord({
+        type: 'redaction',
+        summary: promptInput.length > 60 ? `${promptInput.substring(0, 60)}...` : promptInput,
+        fullContent: promptInput,
+        maskedContent: data.maskedPrompt,
+        entitiesFound: data.entities?.length || 0,
+        entities: data.entities || [],
+        riskLevel: data.entities?.length > 0 ? 'medium' : 'low'
       });
     } catch (err) {
       setError('Failed to process redaction scan. Please try again.');
