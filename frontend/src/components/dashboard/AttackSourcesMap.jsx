@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Globe, ShieldAlert, Activity, CheckCircle2, Zap, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { Globe, ShieldAlert, Activity, CheckCircle2, Zap, ArrowUpRight, ArrowDownRight, Shield, Skull, AlertOctagon, Radio } from 'lucide-react';
 
 const GLOBAL_NODES = [
   {
     id: 'node_ny',
     flag: '🇺🇸',
-    city: 'New York (Gateway Hub)',
+    city: 'New York (US Hub)',
     ip: '198.51.100.45',
     threats: 0,
-    status: 'Gateway',
+    status: 'Gateway Hub',
     lastActivity: '0 sec ago (Hub)',
     nodeStatus: 'gateway',
+    threatIcon: '🌐',
     startX: 250,
     startY: 175
   },
@@ -23,6 +24,7 @@ const GLOBAL_NODES = [
     status: 'Warning',
     lastActivity: '8 sec ago',
     nodeStatus: 'warning',
+    threatIcon: '🦠',
     startX: 495,
     startY: 140
   },
@@ -35,18 +37,20 @@ const GLOBAL_NODES = [
     status: 'Critical Attack',
     lastActivity: '2 sec ago',
     nodeStatus: 'critical',
+    threatIcon: '💀',
     startX: 575,
     startY: 105
   },
   {
     id: 'node_in',
     flag: '🇮🇳',
-    city: 'Bangalore',
+    city: 'Bangalore (Primary Shield Gateway)',
     ip: '103.20.12.88',
     threats: 45,
-    status: 'Safe',
+    status: 'Primary Gateway (Safe)',
     lastActivity: '12 sec ago',
-    nodeStatus: 'safe',
+    nodeStatus: 'primary_gateway',
+    threatIcon: '🛡️',
     startX: 685,
     startY: 245
   },
@@ -56,9 +60,10 @@ const GLOBAL_NODES = [
     city: 'Singapore',
     ip: '128.199.200.1',
     threats: 128,
-    status: 'Warning',
+    status: 'Phishing Vector',
     lastActivity: '14 sec ago',
     nodeStatus: 'warning',
+    threatIcon: '🐟',
     startX: 750,
     startY: 295
   },
@@ -71,6 +76,7 @@ const GLOBAL_NODES = [
     status: 'Safe',
     lastActivity: '45 sec ago',
     nodeStatus: 'safe',
+    threatIcon: '🛡️',
     startX: 868,
     startY: 175
   }
@@ -100,7 +106,7 @@ const AttackSourcesMap = () => {
   return (
     <div className="glass-card p-6 space-y-6 relative overflow-hidden">
       
-      {/* 1. Header with Live Telemetry & Palette Legend */}
+      {/* 1. Enhanced Header with Live Telemetry & Brighter Legend */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#1F2937] pb-4">
         <div>
           <div className="flex items-center space-x-2">
@@ -109,22 +115,22 @@ const AttackSourcesMap = () => {
             </div>
             <h2 className="text-xl font-black text-slate-100 font-sans tracking-tight">Global Threat Intelligence SOC Map</h2>
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">Real-time attack trajectories targeting enterprise AI gateway endpoints.</p>
+          <p className="text-xs text-slate-400 mt-0.5">Real-time attack trajectories targeting enterprise Shield AI gateways.</p>
         </div>
 
-        {/* Legend */}
-        <div className="flex flex-wrap items-center gap-3 text-xs font-mono bg-[#081018]/90 px-4 py-2 rounded-xl border border-[#1F2937] shadow-inner">
+        {/* Enhanced Brighter Legend with Icons */}
+        <div className="flex flex-wrap items-center gap-3 text-xs font-mono bg-[#081018]/95 px-4 py-2 rounded-xl border border-[#1F2937] shadow-inner">
           <span className="flex items-center gap-1.5 text-[#22C55E] font-bold">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#22C55E]"></span> Safe
+            <span>🛡️</span> Safe
           </span>
           <span className="flex items-center gap-1.5 text-[#F59E0B] font-bold">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]"></span> Warning
+            <span>⚠️</span> Warning
           </span>
           <span className="flex items-center gap-1.5 text-[#EF4444] font-bold">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444]"></span> Critical
+            <span>💀</span> Critical
           </span>
           <span className="flex items-center gap-1.5 text-[#06B6D4] font-bold">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#06B6D4]"></span> Gateway Hub
+            <span>🌐</span> Gateway Hub
           </span>
         </div>
       </div>
@@ -132,12 +138,12 @@ const AttackSourcesMap = () => {
       {/* 2. Realistic Dark SVG World Map Canvas with Hex Grid, Radar Sweep & Attack Trajectories */}
       <div className="relative h-96 bg-[#081018] rounded-2xl border border-[#1F2937] flex items-center justify-center overflow-hidden shadow-2xl">
         
-        {/* Floating Background Ambient Particles */}
+        {/* Twinkling Stars & Floating Background Ambient Particles */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-10 left-1/4 w-2 h-2 rounded-full bg-[#3B82F6]/40 animate-float-particle"></div>
-          <div className="absolute top-1/3 right-1/3 w-2.5 h-2.5 rounded-full bg-[#06B6D4]/30 animate-float-particle" style={{ animationDelay: '2s' }}></div>
-          <div className="absolute bottom-1/4 left-1/3 w-2 h-2 rounded-full bg-[#22C55E]/40 animate-float-particle" style={{ animationDelay: '4s' }}></div>
-          <div className="absolute top-1/2 right-1/4 w-3 h-3 rounded-full bg-[#EF4444]/20 animate-float-particle" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-8 left-1/5 w-1.5 h-1.5 rounded-full bg-[#3B82F6] opacity-60 animate-ping"></div>
+          <div className="absolute top-1/4 right-1/4 w-2 h-2 rounded-full bg-[#06B6D4] opacity-80 animate-float-particle"></div>
+          <div className="absolute bottom-1/3 left-1/3 w-1.5 h-1.5 rounded-full bg-[#22C55E] opacity-70 animate-ping" style={{ animationDelay: '3s' }}></div>
+          <div className="absolute top-1/2 right-1/5 w-2 h-2 rounded-full bg-[#EF4444] opacity-50 animate-float-particle" style={{ animationDelay: '1.5s' }}></div>
         </div>
 
         {/* Faint Rotating Radar Sweep Line */}
@@ -178,7 +184,7 @@ const AttackSourcesMap = () => {
             <path d="M 740,315 Q 870,305 860,425 Q 730,425 740,315 Z" />
           </g>
 
-          {/* Animated Curved Trajectory Paths to Gateway (New York: 250, 175) */}
+          {/* Animated Curved Trajectory Paths to Gateway (New York: 250, 175 & Bangalore: 685, 245) */}
           <g>
             {/* 🔴 Critical Arc: Moscow (575, 105) -> NY (250, 175) */}
             <path
@@ -199,35 +205,25 @@ const AttackSourcesMap = () => {
               className="animate-attack-line"
               opacity="0.85"
             />
-            {/* 🟢 Safe Arc: Bangalore (685, 245) -> NY (250, 175) */}
+            {/* 🟢 Safe Arc: Tokyo (868, 175) -> Bangalore Primary Gateway (685, 245) */}
             <path
-              d="M 685 245 Q 450 130 250 175"
+              d="M 868 175 Q 780 180 685 245"
               fill="none"
               stroke="#22C55E"
               strokeWidth="2"
               strokeDasharray="6 6"
               className="animate-attack-line"
-              opacity="0.75"
+              opacity="0.9"
             />
-            {/* 🟡 Warning Arc: Singapore (750, 295) -> NY (250, 175) */}
+            {/* 🟡 Warning Arc: Singapore (750, 295) -> Bangalore Primary Gateway (685, 245) */}
             <path
-              d="M 750 295 Q 500 190 250 175"
+              d="M 750 295 Q 710 280 685 245"
               fill="none"
               stroke="#F59E0B"
-              strokeWidth="1.8"
+              strokeWidth="2"
               strokeDasharray="6 6"
               className="animate-attack-line"
-              opacity="0.8"
-            />
-            {/* 🟢 Safe Arc: Tokyo (868, 175) -> NY (250, 175) */}
-            <path
-              d="M 868 175 Q 550 60 250 175"
-              fill="none"
-              stroke="#22C55E"
-              strokeWidth="1.5"
-              strokeDasharray="6 6"
-              className="animate-attack-line"
-              opacity="0.6"
+              opacity="0.9"
             />
           </g>
 
@@ -238,11 +234,19 @@ const AttackSourcesMap = () => {
             <circle r="4" fill="#081018" />
           </g>
 
+          {/* Primary Highlight Gateway Node (Bangalore / India: 685, 245) */}
+          <g transform="translate(685, 245)">
+            <circle r="24" fill="#22C55E" opacity="0.3" className="animate-ping" />
+            <circle r="12" fill="#22C55E" className="shadow-glow-green" />
+            <circle r="5" fill="#081018" />
+          </g>
+
         </svg>
 
         {/* Accurately Positioned Location Nodes Overlay */}
         {GLOBAL_NODES.map((node) => {
           const isSelected = hoveredNode?.id === node.id;
+          const isPrimaryGateway = node.nodeStatus === 'primary_gateway';
           const isGateway = node.nodeStatus === 'gateway';
           const isCritical = node.nodeStatus === 'critical';
           const isWarning = node.nodeStatus === 'warning';
@@ -258,18 +262,24 @@ const AttackSourcesMap = () => {
               <div className="relative flex items-center justify-center">
                 {/* Expanding Pulsing Circle */}
                 <span className={`animate-ping absolute inline-flex rounded-full opacity-75 ${
-                  isGateway ? 'h-9 w-9 bg-[#06B6D4]' : isCritical ? 'h-10 w-10 bg-[#EF4444]' : isWarning ? 'h-8 w-8 bg-[#F59E0B]' : 'h-7 w-7 bg-[#22C55E]'
+                  isPrimaryGateway ? 'h-11 w-11 bg-[#22C55E]' : isGateway ? 'h-9 w-9 bg-[#06B6D4]' : isCritical ? 'h-10 w-10 bg-[#EF4444]' : isWarning ? 'h-8 w-8 bg-[#F59E0B]' : 'h-7 w-7 bg-[#22C55E]'
                 }`}></span>
                 
-                {/* Center Node Marker */}
-                <span className={`relative inline-flex rounded-full shadow-lg ${
-                  isGateway ? 'h-5.5 w-5.5 bg-[#06B6D4] border-2 border-white' : 'h-4.5 w-4.5 ' + (isCritical ? 'bg-[#EF4444]' : isWarning ? 'bg-[#F59E0B]' : 'bg-[#22C55E]')
-                }`}></span>
+                {/* Center Node Marker with Threat Icon */}
+                <span className={`relative inline-flex items-center justify-center rounded-full shadow-lg font-bold text-[10px] ${
+                  isPrimaryGateway ? 'h-7 w-7 bg-[#22C55E] text-slate-950 ring-4 ring-[#22C55E]/40 animate-pulse' :
+                  isGateway ? 'h-6 w-6 bg-[#06B6D4] text-slate-950 border-2 border-white' :
+                  'h-5.5 w-5.5 ' + (isCritical ? 'bg-[#EF4444] text-white' : isWarning ? 'bg-[#F59E0B] text-slate-950' : 'bg-[#22C55E] text-slate-950')
+                }`}>
+                  {node.threatIcon}
+                </span>
               </div>
 
               {/* Non-overlapping City Label Badge */}
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-[10px] font-mono font-bold text-slate-200 px-2 py-0.5 rounded-lg bg-[#081018]/95 border border-[#1F2937] shadow-lg whitespace-nowrap pointer-events-none">
-                {node.flag} {node.city.split(' ')[0]}
+              <div className={`absolute top-full left-1/2 -translate-x-1/2 mt-1 text-[10px] font-mono font-bold px-2 py-0.5 rounded-lg border shadow-lg whitespace-nowrap pointer-events-none ${
+                isPrimaryGateway ? 'bg-[#22C55E]/20 text-[#22C55E] border-[#22C55E]/50 shadow-glow-green' : 'bg-[#081018]/95 text-slate-200 border-[#1F2937]'
+              }`}>
+                {node.flag} {node.city.split(' ')[0]} {isPrimaryGateway ? '⭐' : ''}
               </div>
 
               {/* Rich Hover Tooltip */}
@@ -279,8 +289,8 @@ const AttackSourcesMap = () => {
                     <span>{node.flag}</span>
                     <span>{node.city}</span>
                   </div>
+                  <div className="text-slate-300">Threat Vector: <span className="font-bold text-amber-400">{node.threatIcon} {node.status}</span></div>
                   <div className="text-slate-300">Threats Blocked: <span className="font-bold text-[#F59E0B]">{node.threats}</span></div>
-                  <div className="text-slate-300">Status: <span className={`font-bold ${isCritical ? 'text-[#EF4444]' : isWarning ? 'text-[#F59E0B]' : 'text-[#22C55E]'}`}>{node.status}</span></div>
                   <div className="text-slate-400 text-[11px] pt-1.5 border-t border-[#1F2937]">Last activity: {node.lastActivity}</div>
                 </div>
               )}

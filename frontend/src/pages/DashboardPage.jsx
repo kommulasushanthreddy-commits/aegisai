@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Shield, Eye, ShieldAlert, Lock, Activity, ArrowRight, TrendingUp, TrendingDown, Sparkles, CheckCircle2, Play, FileText, Edit3, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { Shield, Eye, ShieldAlert, Lock, Activity, ArrowRight, TrendingUp, TrendingDown, Sparkles, CheckCircle2, Play, FileText, Edit3, ArrowUpRight, ArrowDownRight, Clock, Cpu, Server } from 'lucide-react';
 import SecurityScoreRing from '../components/dashboard/SecurityScoreRing';
 import AttackSourcesMap from '../components/dashboard/AttackSourcesMap';
 import AnalyticsCharts from '../components/dashboard/AnalyticsCharts';
@@ -14,6 +14,18 @@ import DisplayNameModal from '../components/common/DisplayNameModal';
 const DashboardPage = () => {
   const { user, role } = useAuth();
   const [isNameModalOpen, setIsNameModalOpen] = useState(false);
+  const [utcTime, setUtcTime] = useState('');
+
+  // Live UTC Clock for Enterprise SOC Header
+  useEffect(() => {
+    const updateClock = () => {
+      const now = new Date();
+      setUtcTime(now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC');
+    };
+    updateClock();
+    const interval = setInterval(updateClock, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Prompt for display name if user has not set a custom display name yet
   useEffect(() => {
@@ -31,40 +43,54 @@ const DashboardPage = () => {
       {/* Top Live Threat Ticker Banner */}
       <ThreatTicker />
 
-      {/* 1. Premium CrowdStrike / Microsoft Defender Style Dashboard Header */}
+      {/* 1. Enterprise SOC Top Header with UTC Clock, Uptime, AI Status & Threat Level */}
       <div className="glass-card p-8 flex flex-wrap items-center justify-between gap-6">
         <div className="space-y-4">
-          <h1 className="text-3xl font-black text-slate-100 tracking-tight font-sans flex items-center gap-3">
-            <span>👋 Welcome back, {user?.name || 'User'}</span>
-            <button
-              onClick={() => setIsNameModalOpen(true)}
-              title="Change Display Name"
-              className="p-1.5 rounded-xl bg-[#1F2937]/80 hover:bg-[#06B6D4]/20 border border-[#374151] text-slate-400 hover:text-[#06B6D4] transition-all"
-            >
-              <Edit3 className="w-4 h-4" />
-            </button>
-          </h1>
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-3xl font-black text-slate-100 tracking-tight font-sans flex items-center gap-3">
+              <span>👋 Welcome back, {user?.name || 'User'}</span>
+              <button
+                onClick={() => setIsNameModalOpen(true)}
+                title="Change Display Name"
+                className="p-1.5 rounded-xl bg-[#1F2937]/80 hover:bg-[#06B6D4]/20 border border-[#374151] text-slate-400 hover:text-[#06B6D4] transition-all"
+              >
+                <Edit3 className="w-4 h-4" />
+              </button>
+            </h1>
+          </div>
 
-          {/* Quick System Status Strip */}
-          <div className="flex flex-wrap items-center gap-3 font-mono text-xs text-slate-300">
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#22C55E]/10 border border-[#22C55E]/30 text-[#22C55E] font-bold">
+          {/* SOC Telemetry Status Bar */}
+          <div className="flex flex-wrap items-center gap-3 font-mono text-xs">
+            
+            {/* Live Clock Badge */}
+            <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#081018] border border-[#1F2937] text-slate-300 font-bold">
+              <Clock className="w-3.5 h-3.5 text-[#06B6D4]" />
+              <span>{utcTime || '04:47:12 UTC'}</span>
+            </div>
+
+            {/* AI Status Badge */}
+            <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#22C55E]/10 border border-[#22C55E]/30 text-[#22C55E] font-bold">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#22C55E] opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[#22C55E]"></span>
               </span>
-              <span>System Status: 🟢 Protected</span>
+              <span>AI Status: 🟢 Online & Intercepting</span>
             </div>
 
-            <div className="px-3.5 py-1 rounded-full bg-[#3B82F6]/10 border border-[#3B82F6]/30 text-[#3B82F6] font-bold">
+            {/* System Uptime Badge */}
+            <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-300 font-bold">
+              <Server className="w-3.5 h-3.5 text-purple-400" />
+              <span>System Uptime: 99.998%</span>
+            </div>
+
+            {/* Threat Level Badge */}
+            <div className="px-3.5 py-1.5 rounded-xl bg-[#3B82F6]/10 border border-[#3B82F6]/30 text-[#3B82F6] font-bold">
               Threat Level: Low
             </div>
 
-            <div className="px-3.5 py-1 rounded-full bg-[#1F2937]/80 border border-[#374151] text-[#9CA3AF]">
-              Last Telemetry Sync: 2 min ago
-            </div>
           </div>
 
-          {/* Header Action Buttons */}
+          {/* Action Buttons */}
           <div className="flex flex-wrap items-center gap-3 pt-1">
             <Link to="/scan/redaction" className="btn-primary">
               <Play className="w-4 h-4 fill-slate-950" />
@@ -180,7 +206,7 @@ const DashboardPage = () => {
 
       </div>
 
-      {/* 3. Global Threat Intelligence Centerpiece Map */}
+      {/* 3. Global Threat Intelligence Centerpiece Map with India Hub Highlight */}
       <AttackSourcesMap />
 
       {/* 4. Threat Level Gauge & Distribution Widgets */}
