@@ -8,34 +8,43 @@ export default {
   theme: {
     extend: {
       colors: {
+        darkBg: '#0B1220',
+        darkCard: '#131B2F',
+        cyanPrimary: '#00D4FF',
+        successGreen: '#00E676',
+        warningYellow: '#FFC107',
+        dangerRed: '#FF5252',
         brand: {
-          dark: '#0a0d14',
-          card: '#121723',
-          cardHover: '#182030',
-          border: '#1e2638',
-          borderLight: '#2a344a',
-          text: '#f1f5f9',
-          muted: '#94a3b8',
-          accent: '#14b8a6', // Teal reserved for AI security layer
-          accentHover: '#0d9488',
-          accentLight: '#2dd4bf',
-          accentGlow: 'rgba(20, 184, 166, 0.15)',
+          dark: '#0B1220',
+          card: '#131B2F',
+          cardHover: '#1A253E',
+          border: '#1E293B',
+          borderLight: '#334155',
+          text: '#F8FAFC',
+          muted: '#94A3B8',
+          accent: '#00D4FF',
+          accentHover: '#00B8E6',
+          accentLight: '#38BDF8',
+          accentGlow: 'rgba(0, 212, 255, 0.2)',
         },
         risk: {
-          low: '#10b981',       // Emerald
-          medium: '#f59e0b',    // Amber
-          high: '#f97316',      // Orange
-          critical: '#ef4444',  // Red
+          low: '#00E676',       // Success Green
+          medium: '#FFC107',    // Amber
+          high: '#FF9100',      // Orange
+          critical: '#FF5252',  // Red
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['Inter', 'Manrope', 'system-ui', '-apple-system', 'sans-serif'],
         mono: ['JetBrains Mono', 'Fira Code', 'Courier New', 'monospace'],
       },
       boxShadow: {
-        'glow-teal': '0 0 20px rgba(20, 184, 166, 0.25)',
-        'glow-amber': '0 0 20px rgba(245, 158, 11, 0.25)',
-        'glow-red': '0 0 20px rgba(239, 68, 68, 0.25)',
+        'glow-cyan': '0 0 25px rgba(0, 212, 255, 0.3)',
+        'glow-cyan-lg': '0 0 35px rgba(0, 212, 255, 0.45)',
+        'glow-green': '0 0 25px rgba(0, 230, 118, 0.3)',
+        'glow-amber': '0 0 25px rgba(255, 193, 7, 0.3)',
+        'glow-red': '0 0 25px rgba(255, 82, 82, 0.3)',
+        'soft-card': '0 10px 30px -5px rgba(0, 0, 0, 0.5)',
       }
     },
   },

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,7 +6,11 @@
 
 @layer base {
   body {
-    @apply bg-[#0a0d14] text-slate-100 font-sans antialiased min-h-screen selection:bg-teal-500/30 selection:text-teal-200;
+    @apply bg-[#0B1220] text-slate-100 font-sans antialiased min-h-screen selection:bg-[#00D4FF]/30 selection:text-[#00D4FF];
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(0, 212, 255, 0.08) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(124, 58, 237, 0.08) 0px, transparent 50%);
+    background-attachment: fixed;
   }
 }
 
@@ -17,30 +21,37 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0d14;
+  background: #0B1220;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e2638;
+  background: #1E293B;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #2a344a;
+  background: #334155;
 }
 
 /* Pulse animation for active monitoring badges */
 @keyframes pulse-glow {
   0%, 100% {
     opacity: 1;
-    box-shadow: 0 0 8px rgba(20, 184, 166, 0.6);
+    box-shadow: 0 0 12px rgba(0, 212, 255, 0.7);
   }
   50% {
-    opacity: 0.6;
-    box-shadow: 0 0 2px rgba(20, 184, 166, 0.2);
+    opacity: 0.5;
+    box-shadow: 0 0 4px rgba(0, 212, 255, 0.2);
   }
 }
 
 .animate-pulse-glow {
   animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Glassmorphism utility */
+.glass-card {
+  background: rgba(19, 27, 47, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }

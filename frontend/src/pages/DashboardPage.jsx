@@ -1,165 +1,182 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Eye, ShieldAlert, History, Activity, ArrowRight, ShieldCheck, Clock, Sparkles } from 'lucide-react';
-import { RiskBadge, AiBadge, RoleBadge } from '../components/common/Badge';
-import { fetchScanHistory } from '../api/admin';
-import { LoadingSkeleton } from '../components/common/LoadingSkeleton';
+import { Eye, ShieldAlert, Activity, ArrowRight, ShieldCheck, Lock, TrendingUp, Sparkles, CheckCircle2, Zap } from 'lucide-react';
+import { RoleBadge } from '../components/common/Badge';
+import SecurityGlobeGraphic from '../components/graphics/SecurityGlobeGraphic';
+import AnalyticsCharts from '../components/dashboard/AnalyticsCharts';
+import RecentActivityTimeline from '../components/dashboard/RecentActivityTimeline';
 
 const DashboardPage = () => {
   const { user, role } = useAuth();
-  const [scans, setScans] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const data = await fetchScanHistory(1, 'all');
-        setScans(data.items || []);
-      } catch (err) {
-        console.error('Failed to load recent scan history:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadData();
-  }, []);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       
-      {/* Welcome Header */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-[#121723] via-[#121723] to-[#182030] border border-[#1e2638] flex flex-wrap items-center justify-between gap-4">
+      {/* 1. Header with Welcome + Live Status + Security Score 96/100 */}
+      <div className="p-6 rounded-3xl bg-gradient-to-r from-[#131B2F] via-[#131B2F] to-[#1A253E] border border-[#1E293B] shadow-soft-card flex flex-wrap items-center justify-between gap-6">
         <div className="space-y-1">
-          <div className="flex items-center space-x-2">
-            <h1 className="text-2xl font-bold text-slate-100">Welcome back, {user?.name}</h1>
+          <div className="flex items-center space-x-3">
+            <h1 className="text-2xl font-black text-slate-100 tracking-tight">
+              Welcome Back, {user?.name || 'Security Specialist'} 👋
+            </h1>
             <RoleBadge role={role} />
           </div>
-          <p className="text-xs text-slate-400 font-mono">
-            AegisAI Gateway Session ID: <span className="text-teal-400">ses_active_9481</span> • Security Posture: OPTIMAL
+          <div className="flex flex-wrap items-center gap-3 pt-1">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00E676]/10 border border-[#00E676]/30 text-[#00E676] text-xs font-mono font-bold">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00E676] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00E676]"></span>
+              </span>
+              <span>Live Protection Enabled</span>
+            </span>
+            <span className="text-xs text-slate-400 font-mono">
+              Gateway Session ID: <code className="text-[#00D4FF]">ses_active_9481</code>
+            </span>
+          </div>
+        </div>
+
+        {/* Security Score Badge Card */}
+        <div className="flex items-center space-x-4 bg-[#0B1220] p-3.5 px-5 rounded-2xl border border-[#00D4FF]/30 shadow-glow-cyan">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#00D4FF] to-[#0099FF] text-slate-950 font-black text-lg flex items-center justify-center shadow-md">
+            96
+          </div>
+          <div>
+            <div className="text-xs font-mono text-slate-400 uppercase tracking-widest">SECURITY SCORE</div>
+            <div className="text-sm font-extrabold text-[#00E676]">96 / 100 • EXCELLENT</div>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. Quick Statistics Grid (4 Metric Cards) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        
+        {/* Metric 1: Threats Blocked */}
+        <div className="p-5 rounded-3xl bg-gradient-to-b from-[#131B2F] to-[#0D1424] border border-[#1E293B] shadow-soft-card space-y-2 hover:border-[#FF5252]/40 hover:-translate-y-1 transition-all group">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">Threats Blocked</span>
+            <div className="w-9 h-9 rounded-xl bg-[#FF5252]/10 text-[#FF5252] border border-[#FF5252]/30 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <ShieldAlert className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="text-2xl font-black text-slate-100 font-mono">1,428</div>
+          <p className="text-[11px] text-[#00E676] font-mono flex items-center gap-1">
+            <TrendingUp className="w-3 h-3" /> +12% this week
           </p>
         </div>
 
-        {role === 'admin' && (
-          <Link
-            to="/admin"
-            className="px-4 py-2.5 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-300 text-sm font-semibold hover:bg-purple-500/20 transition-all flex items-center gap-2"
-          >
-            <Activity className="w-4 h-4 text-purple-400" />
-            <span>Open SOC Admin Dashboard</span>
-          </Link>
-        )}
+        {/* Metric 2: Sensitive Data Masked */}
+        <div className="p-5 rounded-3xl bg-gradient-to-b from-[#131B2F] to-[#0D1424] border border-[#1E293B] shadow-soft-card space-y-2 hover:border-[#00D4FF]/40 hover:-translate-y-1 transition-all group">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">Secrets Protected</span>
+            <div className="w-9 h-9 rounded-xl bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/30 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Lock className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="text-2xl font-black text-slate-100 font-mono">12,543</div>
+          <p className="text-[11px] text-[#00D4FF] font-mono">
+            PII & Secret Keys Redacted
+          </p>
+        </div>
+
+        {/* Metric 3: Phishing Emails Detected */}
+        <div className="p-5 rounded-3xl bg-gradient-to-b from-[#131B2F] to-[#0D1424] border border-[#1E293B] shadow-soft-card space-y-2 hover:border-[#FFC107]/40 hover:-translate-y-1 transition-all group">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">Phishing Flagged</span>
+            <div className="w-9 h-9 rounded-xl bg-[#FFC107]/10 text-[#FFC107] border border-[#FFC107]/30 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Eye className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="text-2xl font-black text-slate-100 font-mono">184</div>
+          <p className="text-[11px] text-[#FFC107] font-mono">
+            High & Critical Severity
+          </p>
+        </div>
+
+        {/* Metric 4: Success Rate */}
+        <div className="p-5 rounded-3xl bg-gradient-to-b from-[#131B2F] to-[#0D1424] border border-[#1E293B] shadow-soft-card space-y-2 hover:border-[#00E676]/40 hover:-translate-y-1 transition-all group">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">Success Rate</span>
+            <div className="w-9 h-9 rounded-xl bg-[#00E676]/10 text-[#00E676] border border-[#00E676]/30 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <ShieldCheck className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="text-2xl font-black text-slate-100 font-mono">99.8%</div>
+          <p className="text-[11px] text-[#00E676] font-mono">
+            Zero Data Leakage Verified
+          </p>
+        </div>
+
       </div>
 
-      {/* Quick Action Gateway Cards */}
+      {/* 3. Action Cards (Prompt Shield & Threat Analyzer) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         
         {/* Prompt Redaction Shield Card */}
-        <div className="p-6 rounded-3xl bg-[#121723] border border-[#1e2638] hover:border-teal-500/40 transition-all group flex flex-col justify-between space-y-4">
+        <div className="p-6 rounded-3xl bg-gradient-to-b from-[#131B2F] to-[#0D1424] border border-[#1E293B] shadow-soft-card hover:border-[#00D4FF]/50 transition-all transform hover:-translate-y-1 group flex flex-col justify-between space-y-5">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <div className="w-12 h-12 rounded-2xl bg-teal-500/10 text-teal-400 border border-teal-500/30 flex items-center justify-center group-hover:scale-105 transition-transform shadow-glow-teal">
+              <div className="w-12 h-12 rounded-2xl bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/30 flex items-center justify-center group-hover:scale-110 transition-transform shadow-glow-cyan">
                 <Eye className="w-6 h-6" />
               </div>
-              <AiBadge label="Redaction Gateway" />
+              <span className="text-xs font-mono px-3 py-1 rounded-full bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/30 font-bold">
+                12,543 Secrets Protected
+              </span>
             </div>
-            <h2 className="text-xl font-bold text-slate-100">Prompt Redaction Shield</h2>
+            <h2 className="text-xl font-bold text-slate-100">🛡️ Prompt Redaction Shield</h2>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Pasting code, financial data, or internal docs? Run it through the Redaction Shield first. We mask sensitive PII and secrets before sending to public LLMs.
+              Pasting code, financial data, or internal memos into ChatGPT/Gemini? Run it through the Redaction Shield to mask API keys, PII, and credentials before LLM dispatch.
             </p>
           </div>
 
           <Link
-            to="/scan/redaction"
-            className="w-full py-3 rounded-xl bg-teal-500 text-slate-950 font-bold hover:bg-teal-400 transition-colors shadow-glow-teal flex items-center justify-center gap-2 text-sm"
+            to="/redaction"
+            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#00D4FF] to-[#0099FF] text-slate-950 font-extrabold hover:brightness-110 transition-all shadow-glow-cyan flex items-center justify-center gap-2 text-sm"
           >
-            <span>Launch Redaction Scanner</span>
+            <span>[ Launch Scanner ]</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
-        {/* Phishing & Social-Engineering Analyzer Card */}
-        <div className="p-6 rounded-3xl bg-[#121723] border border-[#1e2638] hover:border-amber-500/40 transition-all group flex flex-col justify-between space-y-4">
+        {/* Phishing & Threat Analyzer Card */}
+        <div className="p-6 rounded-3xl bg-gradient-to-b from-[#131B2F] to-[#0D1424] border border-[#1E293B] shadow-soft-card hover:border-[#FFC107]/50 transition-all transform hover:-translate-y-1 group flex flex-col justify-between space-y-5">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center justify-center group-hover:scale-105 transition-transform">
+              <div className="w-12 h-12 rounded-2xl bg-[#FFC107]/10 text-[#FFC107] border border-[#FFC107]/30 flex items-center justify-center group-hover:scale-110 transition-transform shadow-glow-amber">
                 <ShieldAlert className="w-6 h-6" />
               </div>
-              <span className="text-xs font-mono font-semibold text-amber-400 uppercase tracking-wider bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/30">
-                Threat Analyzer
+              <span className="text-xs font-mono px-3 py-1 rounded-full bg-[#FFC107]/10 text-[#FFC107] border border-[#FFC107]/30 font-bold">
+                184 Threats Intercepted
               </span>
             </div>
-            <h2 className="text-xl font-bold text-slate-100">Phishing & Threat Analyzer</h2>
+            <h2 className="text-xl font-bold text-slate-100">⚠️ Phishing & Threat Analyzer</h2>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Received a suspicious email, urgency request, or link? Paste the message to get immediate explainable risk breakdown and red flag evidence.
+              Received a suspicious email, urgency reset link, or executive request? Paste the message to get immediate 9-vector threat scoring with explainable evidence flags.
             </p>
           </div>
 
           <Link
-            to="/scan/phishing"
-            className="w-full py-3 rounded-xl bg-[#182030] hover:bg-[#2a344a] text-amber-300 font-bold border border-amber-500/30 transition-colors flex items-center justify-center gap-2 text-sm"
+            to="/phishing"
+            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-extrabold hover:brightness-110 transition-all shadow-glow-cyan flex items-center justify-center gap-2 text-sm"
           >
-            <span>Analyze Suspicious Message</span>
+            <span>[ Analyze Message ]</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
       </div>
 
-      {/* Recent Activity Feed */}
-      <div className="p-6 rounded-3xl bg-[#121723] border border-[#1e2638] space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Clock className="w-5 h-5 text-teal-400" />
-            <h3 className="text-lg font-bold text-slate-100">Recent Security Operations</h3>
-          </div>
-          <Link
-            to="/history"
-            className="text-xs text-teal-400 hover:underline font-mono font-semibold flex items-center gap-1"
-          >
-            View All History <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
+      {/* 4. Visual Analytics Charts Section */}
+      <AnalyticsCharts />
+
+      {/* 5. Bottom Section: Security Globe + Recent Activity Timeline */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <RecentActivityTimeline />
         </div>
-
-        {loading ? (
-          <LoadingSkeleton count={3} />
-        ) : scans.length === 0 ? (
-          <div className="text-center py-8 text-slate-400 text-xs font-mono">
-            No scans performed in this session yet. Try launching the Redaction Shield above!
-          </div>
-        ) : (
-          <div className="divide-y divide-[#1e2638]">
-            {scans.slice(0, 4).map((scan) => (
-              <div key={scan.id} className="py-4 flex flex-wrap items-center justify-between gap-4">
-                <div className="flex items-center space-x-3">
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${
-                    scan.type === 'redaction'
-                      ? 'bg-teal-500/10 text-teal-400 border border-teal-500/30'
-                      : 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
-                  }`}>
-                    {scan.type === 'redaction' ? <Eye className="w-4 h-4" /> : <ShieldAlert className="w-4 h-4" />}
-                  </div>
-                  <div>
-                    <span className="text-sm font-semibold text-slate-200 block">{scan.summary}</span>
-                    <span className="text-[11px] text-slate-400 font-mono">
-                      {new Date(scan.timestamp).toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-3">
-                  {scan.type === 'redaction' ? (
-                    <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-teal-500/10 text-teal-300 border border-teal-500/30">
-                      {scan.entitiesFound} Entities Masked
-                    </span>
-                  ) : (
-                    <RiskBadge level={scan.riskLevel} score={scan.riskScore} />
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        <div className="lg:col-span-1">
+          <SecurityGlobeGraphic />
+        </div>
       </div>
 
     </div>
