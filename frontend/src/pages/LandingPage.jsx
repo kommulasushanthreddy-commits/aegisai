@@ -2,10 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Shield, Eye, ShieldAlert, Lock, Activity, ArrowRight, Sparkles, CheckCircle2, FileCode, Check } from 'lucide-react';
 import { AiBadge } from '../components/common/Badge';
+import SecurityFlowDiagram from '../components/graphics/SecurityFlowDiagram';
+import ThreatRadarGraphic from '../components/graphics/ThreatRadarGraphic';
 
 const LandingPage = () => {
   return (
-    <div className="space-y-24 py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div className="space-y-20 py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       
       {/* Hero Section */}
       <div className="text-center space-y-8 max-w-4xl mx-auto">
@@ -38,6 +40,12 @@ const LandingPage = () => {
           </Link>
         </div>
       </div>
+
+      {/* GRAPHIC 1: Interactive Security Flow Diagram */}
+      <SecurityFlowDiagram />
+
+      {/* GRAPHIC 2: Threat Radar & Perimeter Shield */}
+      <ThreatRadarGraphic />
 
       {/* Interactive Feature Demo Highlight */}
       <div className="p-8 rounded-3xl bg-gradient-to-b from-[#121723] to-[#0a0d14] border border-[#1e2638] shadow-2xl relative overflow-hidden">
