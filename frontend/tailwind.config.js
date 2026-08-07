@@ -38,13 +38,14 @@ export default {
         mono: ['JetBrains Mono', 'Fira Code', 'Courier New', 'monospace'],
       },
       boxShadow: {
-        'glow-cyan': '0 0 25px rgba(0, 212, 255, 0.35)',
-        'glow-cyan-lg': '0 0 40px rgba(0, 212, 255, 0.5)',
-        'glow-indigo': '0 0 25px rgba(99, 102, 241, 0.35)',
-        'glow-green': '0 0 25px rgba(34, 197, 94, 0.35)',
-        'glow-yellow': '0 0 25px rgba(250, 204, 21, 0.35)',
-        'glow-red': '0 0 25px rgba(239, 68, 68, 0.35)',
-        'glass': '0 10px 30px 0 rgba(0, 0, 0, 0.37)',
+        // Toned down by 30% for ultra-premium readability
+        'glow-cyan': '0 0 15px rgba(0, 212, 255, 0.15)',
+        'glow-cyan-lg': '0 0 25px rgba(0, 212, 255, 0.22)',
+        'glow-indigo': '0 0 15px rgba(99, 102, 241, 0.15)',
+        'glow-green': '0 0 15px rgba(34, 197, 94, 0.15)',
+        'glow-yellow': '0 0 15px rgba(250, 204, 21, 0.15)',
+        'glow-red': '0 0 15px rgba(239, 68, 68, 0.15)',
+        'glass': '0 10px 30px 0 rgba(0, 0, 0, 0.25)',
       }
     },
   },

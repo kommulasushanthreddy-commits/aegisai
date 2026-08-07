@@ -6,17 +6,22 @@ import SecurityScoreRing from '../components/dashboard/SecurityScoreRing';
 import AttackSourcesMap from '../components/dashboard/AttackSourcesMap';
 import AnalyticsCharts from '../components/dashboard/AnalyticsCharts';
 import RealTimeActivityFeed from '../components/dashboard/RealTimeActivityFeed';
+import QuickActionsPanel from '../components/dashboard/QuickActionsPanel';
+import ThreatTicker from '../components/common/ThreatTicker';
 
 const DashboardPage = () => {
   const { user, role } = useAuth();
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="space-y-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       
+      {/* Top Live Threat Ticker Banner */}
+      <ThreatTicker />
+
       {/* 1. Premium Dashboard Header */}
-      <div className="glass-card p-6 flex flex-wrap items-center justify-between gap-6">
-        <div className="space-y-3">
-          <h1 className="text-3xl font-black text-slate-100 tracking-tight">
+      <div className="glass-card p-8 flex flex-wrap items-center justify-between gap-6">
+        <div className="space-y-4">
+          <h1 className="text-3xl font-black text-slate-100 tracking-tight font-sans">
             👋 Welcome back, {user?.name || 'Sushanth'}
           </h1>
 
@@ -34,13 +39,13 @@ const DashboardPage = () => {
               Threat Level: Low
             </div>
 
-            <div className="px-3 py-1 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-400">
+            <div className="px-3 py-1 rounded-full bg-slate-800/60 border border-slate-700/50 text-[#9CA3AF]">
               Last Scan: 2 min ago
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-wrap items-center gap-3 pt-2">
+          {/* Header Buttons */}
+          <div className="flex flex-wrap items-center gap-3 pt-1">
             <Link to="/scan/redaction" className="btn-primary">
               <Play className="w-4 h-4 fill-slate-950" />
               <span>Run Security Scan</span>
@@ -53,18 +58,21 @@ const DashboardPage = () => {
         </div>
 
         {/* Security Score Ring */}
-        <div className="p-4 rounded-2xl bg-[#09090B]/60 border border-white/10 shadow-glow-cyan">
+        <div className="p-4 rounded-2xl bg-[#09090B]/80 border border-white/10 shadow-glow-cyan">
           <SecurityScoreRing score={98} />
         </div>
       </div>
 
-      {/* 2. Four KPI Cards */}
+      {/* 2. Quick Operations Panel */}
+      <QuickActionsPanel />
+
+      {/* 3. Four KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
         {/* KPI 1: Threats Blocked */}
-        <div className="glass-card p-6 space-y-3 hover:border-[#EF4444]/50">
+        <div className="glass-card p-6 space-y-3 hover:border-[#EF4444]/40">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">Threats Blocked</span>
+            <span className="text-xs font-mono text-[#9CA3AF] uppercase tracking-wider">Threats Blocked</span>
             <div className="w-10 h-10 rounded-xl bg-[#EF4444]/10 text-[#EF4444] border border-[#EF4444]/30 flex items-center justify-center">
               <ShieldAlert className="w-5 h-5" />
             </div>
@@ -76,9 +84,9 @@ const DashboardPage = () => {
         </div>
 
         {/* KPI 2: Secrets Masked */}
-        <div className="glass-card p-6 space-y-3 hover:border-[#00D4FF]/50">
+        <div className="glass-card p-6 space-y-3 hover:border-[#00D4FF]/40">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">Secrets Masked</span>
+            <span className="text-xs font-mono text-[#9CA3AF] uppercase tracking-wider">Secrets Masked</span>
             <div className="w-10 h-10 rounded-xl bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/30 flex items-center justify-center">
               <Lock className="w-5 h-5" />
             </div>
@@ -90,9 +98,9 @@ const DashboardPage = () => {
         </div>
 
         {/* KPI 3: Suspicious Emails */}
-        <div className="glass-card p-6 space-y-3 hover:border-[#FACC15]/50">
+        <div className="glass-card p-6 space-y-3 hover:border-[#FACC15]/40">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">Suspicious Emails</span>
+            <span className="text-xs font-mono text-[#9CA3AF] uppercase tracking-wider">Suspicious Emails</span>
             <div className="w-10 h-10 rounded-xl bg-[#FACC15]/10 text-[#FACC15] border border-[#FACC15]/30 flex items-center justify-center">
               <Eye className="w-5 h-5" />
             </div>
@@ -104,9 +112,9 @@ const DashboardPage = () => {
         </div>
 
         {/* KPI 4: Risk Score */}
-        <div className="glass-card p-6 space-y-3 hover:border-[#22C55E]/50">
+        <div className="glass-card p-6 space-y-3 hover:border-[#22C55E]/40">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">Risk Score</span>
+            <span className="text-xs font-mono text-[#9CA3AF] uppercase tracking-wider">Risk Score</span>
             <div className="w-10 h-10 rounded-xl bg-[#22C55E]/10 text-[#22C55E] border border-[#22C55E]/30 flex items-center justify-center">
               <CheckCircle2 className="w-5 h-5" />
             </div>
@@ -119,18 +127,18 @@ const DashboardPage = () => {
 
       </div>
 
-      {/* 3. Threat Detection Line Chart + World Attack Sources Map */}
-      <div className="space-y-6">
+      {/* 4. Threat Detection Line Chart + World Attack Sources Map */}
+      <div className="space-y-8">
         <AnalyticsCharts />
         <AttackSourcesMap />
       </div>
 
-      {/* 4. Scanner Action Cards (Prompt Shield + Phishing Analyzer) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* 5. Scanner Action Cards (Prompt Shield + Phishing Analyzer) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         
         {/* Prompt Shield */}
-        <div className="glass-card p-6 flex flex-col justify-between space-y-4 hover:border-[#00D4FF]/50">
-          <div className="space-y-3">
+        <div className="glass-card p-8 flex flex-col justify-between space-y-6 hover:border-[#00D4FF]/40">
+          <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="w-12 h-12 rounded-2xl bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/30 flex items-center justify-center shadow-glow-cyan">
                 <Eye className="w-6 h-6" />
@@ -139,8 +147,8 @@ const DashboardPage = () => {
                 12,543 Secrets Protected
               </span>
             </div>
-            <h2 className="text-xl font-bold text-slate-100">🛡️ Prompt Redaction Shield</h2>
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <h2 className="text-2xl font-black text-slate-100 tracking-tight">🛡️ Prompt Redaction Shield</h2>
+            <p className="text-sm text-[#9CA3AF] leading-relaxed">
               Detects API keys, PII, and credentials in prompts and replaces them with safe tokens before LLM dispatch.
             </p>
           </div>
@@ -152,8 +160,8 @@ const DashboardPage = () => {
         </div>
 
         {/* Phishing Analyzer */}
-        <div className="glass-card p-6 flex flex-col justify-between space-y-4 hover:border-[#FACC15]/50">
-          <div className="space-y-3">
+        <div className="glass-card p-8 flex flex-col justify-between space-y-6 hover:border-[#FACC15]/40">
+          <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="w-12 h-12 rounded-2xl bg-[#FACC15]/10 text-[#FACC15] border border-[#FACC15]/30 flex items-center justify-center shadow-glow-yellow">
                 <ShieldAlert className="w-6 h-6" />
@@ -162,8 +170,8 @@ const DashboardPage = () => {
                 184 Threats Intercepted
               </span>
             </div>
-            <h2 className="text-xl font-bold text-slate-100">📧 Phishing & Threat Analyzer</h2>
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <h2 className="text-2xl font-black text-slate-100 tracking-tight">📧 Phishing & Threat Analyzer</h2>
+            <p className="text-sm text-[#9CA3AF] leading-relaxed">
               Analyze suspicious emails or urgency requests with 9-vector risk scoring and explainable evidence flags.
             </p>
           </div>
@@ -176,7 +184,7 @@ const DashboardPage = () => {
 
       </div>
 
-      {/* 5. Live Activity Feed */}
+      {/* 6. Real-Time Security Activity Feed */}
       <RealTimeActivityFeed />
 
     </div>
