@@ -6,7 +6,6 @@ import SecurityScoreRing from '../components/dashboard/SecurityScoreRing';
 import AttackSourcesMap from '../components/dashboard/AttackSourcesMap';
 import AnalyticsCharts from '../components/dashboard/AnalyticsCharts';
 import RealTimeActivityFeed from '../components/dashboard/RealTimeActivityFeed';
-import QuickActionsPanel from '../components/dashboard/QuickActionsPanel';
 import ThreatTicker from '../components/common/ThreatTicker';
 
 const DashboardPage = () => {
@@ -63,10 +62,7 @@ const DashboardPage = () => {
         </div>
       </div>
 
-      {/* 2. Quick Operations Panel */}
-      <QuickActionsPanel />
-
-      {/* 3. Four KPI Cards */}
+      {/* 2. Four KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
         {/* KPI 1: Threats Blocked */}
