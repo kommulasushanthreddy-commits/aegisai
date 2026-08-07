@@ -8,30 +8,29 @@ export default {
   theme: {
     extend: {
       colors: {
-        darkBg: '#0B1220',
-        darkCard: '#131B2F',
-        cyanPrimary: '#00D4FF',
-        successGreen: '#00E676',
-        warningYellow: '#FFC107',
-        dangerRed: '#FF5252',
+        darkBg: '#09090B',
+        darkCard: '#111827',
+        primaryCyan: '#00D4FF',
+        secondaryIndigo: '#6366F1',
+        successGreen: '#22C55E',
+        warningYellow: '#FACC15',
+        dangerRed: '#EF4444',
+        textLight: '#F9FAFB',
         brand: {
-          dark: '#0B1220',
-          card: '#131B2F',
-          cardHover: '#1A253E',
-          border: '#1E293B',
-          borderLight: '#334155',
-          text: '#F8FAFC',
-          muted: '#94A3B8',
+          dark: '#09090B',
+          card: '#111827',
+          cardHover: '#1F2937',
+          border: 'rgba(255, 255, 255, 0.08)',
+          text: '#F9FAFB',
+          muted: '#9CA3AF',
           accent: '#00D4FF',
           accentHover: '#00B8E6',
-          accentLight: '#38BDF8',
-          accentGlow: 'rgba(0, 212, 255, 0.2)',
         },
         risk: {
-          low: '#00E676',       // Success Green
-          medium: '#FFC107',    // Amber
-          high: '#FF9100',      // Orange
-          critical: '#FF5252',  // Red
+          low: '#22C55E',       // Success Green
+          medium: '#FACC15',    // Warning Yellow
+          high: '#F97316',      // Orange
+          critical: '#EF4444',  // Danger Red
         }
       },
       fontFamily: {
@@ -39,12 +38,13 @@ export default {
         mono: ['JetBrains Mono', 'Fira Code', 'Courier New', 'monospace'],
       },
       boxShadow: {
-        'glow-cyan': '0 0 25px rgba(0, 212, 255, 0.3)',
-        'glow-cyan-lg': '0 0 35px rgba(0, 212, 255, 0.45)',
-        'glow-green': '0 0 25px rgba(0, 230, 118, 0.3)',
-        'glow-amber': '0 0 25px rgba(255, 193, 7, 0.3)',
-        'glow-red': '0 0 25px rgba(255, 82, 82, 0.3)',
-        'soft-card': '0 10px 30px -5px rgba(0, 0, 0, 0.5)',
+        'glow-cyan': '0 0 25px rgba(0, 212, 255, 0.35)',
+        'glow-cyan-lg': '0 0 40px rgba(0, 212, 255, 0.5)',
+        'glow-indigo': '0 0 25px rgba(99, 102, 241, 0.35)',
+        'glow-green': '0 0 25px rgba(34, 197, 94, 0.35)',
+        'glow-yellow': '0 0 25px rgba(250, 204, 21, 0.35)',
+        'glow-red': '0 0 25px rgba(239, 68, 68, 0.35)',
+        'glass': '0 10px 30px 0 rgba(0, 0, 0, 0.37)',
       }
     },
   },
